@@ -61,6 +61,7 @@ const app = createApp({
     SignInPage: props => (
       <SignInPage
         {...props}
+        auto={false}
         providers={[
           'guest',
           {
