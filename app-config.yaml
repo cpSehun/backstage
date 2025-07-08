@@ -1,6 +1,6 @@
 app:
   title: Scaffolded Backstage App
-  baseUrl: ${BASE_URL}
+  baseUrl: ${FRONTEND_BASE_URL}
 
 organization:
   name: Cplabs
@@ -12,7 +12,7 @@ backend:
   # auth:
   #   keys:
   #     - secret: ${BACKEND_SECRET}
-  baseUrl: ${BASE_URL}
+  baseUrl: ${BACKEND_BASE_URL}
   listen:
     port: 7007
     # Uncomment the following host directive to bind to specific interfaces
@@ -22,7 +22,7 @@ backend:
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
     # Default Helmet Content-Security-Policy values can be removed by setting the key to false
   cors:
-    origin: ${BASE_URL}
+    origin: ${FRONTEND_BASE_URL}
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
   # This is for local development only, it is not recommended to use this in production
@@ -73,16 +73,16 @@ auth:
   providers:
     guest:
       dangerouslyAllowOutsideDevelopment: true
-    google:
-      development:
-        clientId: ${AUTH_GOOGLE_CLIENT_ID}
-        clientSecret: ${AUTH_GOOGLE_CLIENT_SECRET}
-        ## uncomment to set lifespan of user session
-        # sessionDuration: { hours: 24 } # supports `ms` library format (e.g. '24h', '2 days'), ISO duration, "human duration" as used in code
-        signIn:
-          resolvers:
-            # See https://backstage.io/docs/auth/google/provider#resolvers for more resolvers
-            - resolver: emailLocalPartMatchingUserEntityName
+    # google:
+    #   development:
+    #     clientId: ${AUTH_GOOGLE_CLIENT_ID}
+    #     clientSecret: ${AUTH_GOOGLE_CLIENT_SECRET}
+    #     ## uncomment to set lifespan of user session
+    #     # sessionDuration: { hours: 24 } # supports `ms` library format (e.g. '24h', '2 days'), ISO duration, "human duration" as used in code
+    #     signIn:
+    #       resolvers:
+    #         # See https://backstage.io/docs/auth/google/provider#resolvers for more resolvers
+    #         - resolver: emailLocalPartMatchingUserEntityName
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
@@ -94,33 +94,20 @@ catalog:
   rules:
     - allow: [Component, System, API, Resource, Location]
   locations:
-    # Local example data, file locations are relative to the backend process, typically `packages/backend`
+    # 절대 경로 사용 (Docker 컨테이너 내부 기준)
     - type: file
-      target: ../../examples/entities.yaml
+      target: /app/examples/entities.yaml
 
-    # Local example template
     - type: file
-      target: ../../examples/template/template.yaml
+      target: /app/examples/template/template.yaml
       rules:
         - allow: [Template]
 
-    # Local example organizational data
     - type: file
-      target: ./examples/org.yaml
+      target: /app/examples/org.yaml
       rules:
         - allow: [User, Group]
 
-    ## Uncomment these lines to add more example data
-    # - type: url
-    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml
-
-    ## Uncomment these lines to add an example org
-    # - type: url
-    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/acme-corp.yaml
-    #   rules:
-    #     - allow: [User, Group]
-  # Experimental: Always use the search method in UrlReaderProcessor.
-  # New adopters are encouraged to enable it as this behavior will be the default in a future release.
   useUrlReadersSearch: true
 
 kubernetes:
