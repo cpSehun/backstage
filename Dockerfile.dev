@@ -1,0 +1,25 @@
+FROM node:20-bookworm-slim
+
+# Python 설치 (node-gyp용)
+ENV PYTHON=/usr/bin/python3
+
+# 빌드 도구 설치
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
+    apt-get install -y --no-install-recommends python3 g++ build-essential libsqlite3-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# 권한 문제 해결을 위해 root로 실행
+USER root
+WORKDIR /app
+
+# node 사용자에게 /app 권한 부여
+RUN chown -R node:node /app
+
+# 개발 모드로 설정 (중요!)
+ENV NODE_ENV=development
+ENV NODE_OPTIONS="--no-node-snapshot"
+
+# 컨테이너를 계속 실행 상태로 유지
+CMD ["tail", "-f", "/dev/null"]
