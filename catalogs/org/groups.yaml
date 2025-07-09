@@ -7,50 +7,62 @@ metadata:
 spec:
   type: organization
   children:
-    [AiSolutionDev1, AiSolutionDev2, ServiceDev1, ServiceDev2, DaepaDev, LAB]
+    [
+      AI Solution Dev 1,
+      AI Solution Dev 2,
+      Service Dev 1,
+      Service Dev 2,
+      Daepa Dev,
+      LAB,
+    ]
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: AiSolutionDev1
-  description: AiSolutionDev1 team
+  name: AI Solution Dev 1
+  description: AI Solution Dev 1 team
 spec:
+  namespace: labatory
   type: team
   parent: CPLABS
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: AiSolutionDev2
-  description: AiSolutionDev2 team
+  name: AI Solution Dev 2
+  description: AI Solution Dev 2 team
 spec:
+  namespace: labatory
   type: team
   parent: CPLABS
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: ServiceDev1
-  description: ServiceDev1 team
+  name: Service Dev 1
+  description: Service Dev 1 team
 spec:
+  namespace: labatory
   type: team
   parent: CPLABS
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: AI ServiceDev2
-  description: AI ServiceDev2 team
+  name: Service Dev 2
+  description: Service Dev 2 team
 spec:
+  namespace: labatory
   type: team
   parent: CPLABS
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: DaepaDev
-  description: DaepaDev team
+  name: DaePa Dev
+  description: DaePa Dev team
 spec:
+  namespace: labatory
   type: team
   parent: CPLABS
 ---
@@ -60,6 +72,7 @@ metadata:
   name: LAB
   description: LABATORY
 spec:
+  namespace: labatory
   type: team
   parent: CPLABS
 ---

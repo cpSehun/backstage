@@ -9,7 +9,7 @@ spec:
     displayName: Sehun Kim
     email: sehun@coinplug.com
     # picture: https://avatars.githubusercontent.com/u/sehun?s=400&v=4  # 선택사항
-  memberOf: [CPLABS, AiSolutionDev2]
+  memberOf: [CPLABS, 'AI Solution Dev 2']
 
 ---
 apiVersion: backstage.io/v1alpha1
@@ -22,7 +22,7 @@ spec:
     displayName: John Doe
     email: john.doe@coinplug.com
     picture: https://avatars.githubusercontent.com/u/johndoe?s=400&v=4
-  memberOf: [CPLABS, AiSolutionDev1]
+  memberOf: [CPLABS, 'AI Solution Dev 1']
 
 ---
 apiVersion: backstage.io/v1alpha1
@@ -35,7 +35,7 @@ spec:
     displayName: Jane Smith
     email: jane.smith@coinplug.com
     picture: https://avatars.githubusercontent.com/u/janesmith?s=400&v=4
-  memberOf: [CPLABS, ServiceDev2]
+  memberOf: [CPLABS, 'AI Service Dev 2']
 
 ---
 apiVersion: backstage.io/v1alpha1
@@ -48,7 +48,7 @@ spec:
     displayName: Alex Park
     email: alex.park@coinplug.com
     picture: https://avatars.githubusercontent.com/u/alexpark?s=400&v=4
-  memberOf: [CPLABS, ServiceDev1]
+  memberOf: [CPLABS, 'Service Dev 1']
 
 ---
 apiVersion: backstage.io/v1alpha1
@@ -61,7 +61,7 @@ spec:
     displayName: Sarah Lee
     email: sarah.lee@coinplug.com
     picture: https://avatars.githubusercontent.com/u/sarahlee?s=400&v=4
-  mmemberOf: [CPLABS, DaepaDev]
+  memberOf: [CPLABS, 'DaePa Dev']
 
 ---
 apiVersion: backstage.io/v1alpha1
@@ -74,4 +74,4 @@ spec:
     displayName: Mike Chen
     email: mike.chen@coinplug.com
     picture: https://avatars.githubusercontent.com/u/mikechen?s=400&v=4
-  mmemberOf: [CPLABS, LAB]
+  memberOf: [CPLABS, LAB]
