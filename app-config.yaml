@@ -1,5 +1,5 @@
 app:
-  title: Scaffolded Backstage App
+  title: CPLABS Backstage APP
   baseUrl: ${FRONTEND_BASE_URL}
 
 organization:
@@ -73,16 +73,16 @@ auth:
   providers:
     guest:
       dangerouslyAllowOutsideDevelopment: true
-    # google:
-    #   development:
-    #     clientId: ${AUTH_GOOGLE_CLIENT_ID}
-    #     clientSecret: ${AUTH_GOOGLE_CLIENT_SECRET}
-    #     ## uncomment to set lifespan of user session
-    #     # sessionDuration: { hours: 24 } # supports `ms` library format (e.g. '24h', '2 days'), ISO duration, "human duration" as used in code
-    #     signIn:
-    #       resolvers:
-    #         # See https://backstage.io/docs/auth/google/provider#resolvers for more resolvers
-    #         - resolver: emailLocalPartMatchingUserEntityName
+    google:
+      development:
+        clientId: ${AUTH_GOOGLE_CLIENT_ID}
+        clientSecret: ${AUTH_GOOGLE_CLIENT_SECRET}
+        # uncomment to set lifespan of user session
+        # sessionDuration: { hours: 24 } # supports `ms` library format (e.g. '24h', '2 days'), ISO duration, "human duration" as used in code
+        signIn:
+          resolvers:
+            # See https://backstage.io/docs/auth/google/provider#resolvers for more resolvers
+            - resolver: emailLocalPartMatchingUserEntityName
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
@@ -96,18 +96,30 @@ catalog:
   locations:
     # 절대 경로 사용 (Docker 컨테이너 내부 기준)
     - type: file
-      target: /app/examples/entities.yaml
+      target: /app/catalogs/entities.yaml
+
+    # 그룹 정보
+    - type: file
+      target: /app/catalogs/org/groups.yaml
+      rules:
+        - allow: [Group]
+
+    # 사용자 파일들 (각각 개별 등록)
+    - type: file
+      target: /app/catalogs/org/users/developers.yaml
+      rules:
+        - allow: [User]
 
     - type: file
-      target: /app/examples/template/template.yaml
+      target: /app/catalogs/org/users/managers.yaml
+      rules:
+        - allow: [User]
+
+    # 템플릿
+    - type: file
+      target: /app/catalogs/template/template.yaml
       rules:
         - allow: [Template]
-
-    - type: file
-      target: /app/examples/org.yaml
-      rules:
-        - allow: [User, Group]
-
   useUrlReadersSearch: true
 
 kubernetes:

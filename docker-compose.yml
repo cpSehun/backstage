@@ -15,6 +15,7 @@ services:
       - .env
     ports:
       - '3001:7007'
+      - '7007:7007'
     depends_on:
       - postgres
 

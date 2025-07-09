@@ -1,0 +1,106 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: CPLABS
+  description: All CPLABS employees
+spec:
+  type: organization
+  children:
+    [AiSolutionDev1, AiSolutionDev2, ServiceDev1, ServiceDev2, DaepaDev, LAB]
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: AiSolutionDev1
+  description: AiSolutionDev1 team
+spec:
+  type: team
+  parent: CPLABS
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: AiSolutionDev2
+  description: AiSolutionDev2 team
+spec:
+  type: team
+  parent: CPLABS
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: ServiceDev1
+  description: ServiceDev1 team
+spec:
+  type: team
+  parent: CPLABS
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: AI ServiceDev2
+  description: AI ServiceDev2 team
+spec:
+  type: team
+  parent: CPLABS
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: DaepaDev
+  description: DaepaDev team
+spec:
+  type: team
+  parent: CPLABS
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: LAB
+  description: LABATORY
+spec:
+  type: team
+  parent: CPLABS
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: managers
+  description: Management team
+spec:
+  type: team
+  parent: CPLABS
+  children: [engineering-managers, product-managers, executives]
+
+---
+# 관리팀 하위 그룹들
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: engineering-managers
+  description: Engineering managers
+spec:
+  type: role
+  parent: managers
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: product-managers
+  description: Product managers
+spec:
+  type: role
+  parent: managers
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: executives
+  description: Executive team
+spec:
+  type: role
+  parent: managers

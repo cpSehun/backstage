@@ -1,0 +1,77 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: sehun
+  description: Devops Engineer
+spec:
+  profile:
+    displayName: Sehun Kim
+    email: sehun@coinplug.com
+    # picture: https://avatars.githubusercontent.com/u/sehun?s=400&v=4  # 선택사항
+  memberOf: [CPLABS, AiSolutionDev2]
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: john-doe
+  description: Backend Developer
+spec:
+  profile:
+    displayName: John Doe
+    email: john.doe@coinplug.com
+    picture: https://avatars.githubusercontent.com/u/johndoe?s=400&v=4
+  memberOf: [CPLABS, AiSolutionDev1]
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: jane-smith
+  description: Full Stack Developer
+spec:
+  profile:
+    displayName: Jane Smith
+    email: jane.smith@coinplug.com
+    picture: https://avatars.githubusercontent.com/u/janesmith?s=400&v=4
+  memberOf: [CPLABS, ServiceDev2]
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: alex-park
+  description: DevOps Engineer
+spec:
+  profile:
+    displayName: Alex Park
+    email: alex.park@coinplug.com
+    picture: https://avatars.githubusercontent.com/u/alexpark?s=400&v=4
+  memberOf: [CPLABS, ServiceDev1]
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: sarah-lee
+  description: Mobile Developer
+spec:
+  profile:
+    displayName: Sarah Lee
+    email: sarah.lee@coinplug.com
+    picture: https://avatars.githubusercontent.com/u/sarahlee?s=400&v=4
+  mmemberOf: [CPLABS, DaepaDev]
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: mike-chen
+  description: Senior Backend Developer & Team Lead
+spec:
+  profile:
+    displayName: Mike Chen
+    email: mike.chen@coinplug.com
+    picture: https://avatars.githubusercontent.com/u/mikechen?s=400&v=4
+  mmemberOf: [CPLABS, LAB]

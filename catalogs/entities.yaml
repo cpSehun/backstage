@@ -1,0 +1,404 @@
+---
+# 기존 예시 시스템
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: examples
+  description: Example system for demonstration
+spec:
+  owner: ServiceDev1
+
+---
+# DevOps 인프라 시스템
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: infrastructure
+  description: Core infrastructure and DevOps systems
+spec:
+  owner: AiSolutionDev2
+
+---
+# CI/CD 시스템
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: cicd
+  description: Continuous Integration and Deployment system
+spec:
+  owner: AiSolutionDev2
+
+---
+# 모니터링 시스템
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: monitoring
+  description: Application and infrastructure monitoring
+spec:
+  owner: AiSolutionDev2
+
+---
+# 기존 예시 웹사이트
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: example-website
+  description: Example website component
+spec:
+  type: website
+  lifecycle: experimental
+  owner: frontend
+  system: examples
+  providesApis: [example-grpc-api]
+
+---
+# Jenkins CI/CD
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: jenkins
+  description: Jenkins CI/CD server
+  annotations:
+    jenkins.io/job-full-name: 'coinplug/jenkins'
+spec:
+  type: service
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: cicd
+  dependsOn: [resource:jenkins-storage]
+
+---
+# GitLab CI/CD
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: gitlab-ci
+  description: GitLab CI/CD pipelines
+spec:
+  type: service
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: cicd
+
+---
+# Docker Registry
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: docker-registry
+  description: Private Docker container registry
+spec:
+  type: service
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: infrastructure
+  providesApis: [docker-registry-api]
+
+---
+# Kubernetes Cluster
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: kubernetes-cluster
+  description: Main Kubernetes cluster
+  annotations:
+    kubernetes.io/cluster-name: 'coinplug-prod'
+spec:
+  type: service
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: infrastructure
+  consumesApis: [kubernetes-api]
+
+---
+# Prometheus 모니터링
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: prometheus
+  description: Prometheus monitoring system
+spec:
+  type: service
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: monitoring
+  providesApis: [prometheus-api]
+
+---
+# Grafana 대시보드
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: grafana
+  description: Grafana monitoring dashboards
+spec:
+  type: service
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: monitoring
+  consumesApis: [prometheus-api]
+  providesApis: [grafana-api]
+
+---
+# ELK Stack (로그 수집)
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: elk-stack
+  description: Elasticsearch, Logstash, Kibana for log management
+spec:
+  type: service
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: monitoring
+  providesApis: [elasticsearch-api, kibana-api]
+
+---
+# 기존 예시 API
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: example-grpc-api
+  description: Example gRPC API
+spec:
+  type: grpc
+  lifecycle: experimental
+  owner: backend
+  system: examples
+  definition: |
+    syntax = "proto3";
+
+    service Exampler {
+      rpc Example (ExampleMessage) returns (ExampleMessage) {};
+    }
+
+    message ExampleMessage {
+      string example = 1;
+    };
+
+---
+# Docker Registry API
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: docker-registry-api
+  description: Docker Registry REST API
+spec:
+  type: openapi
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: infrastructure
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: Docker Registry API
+      version: 2.0.0
+    paths:
+      /v2/_catalog:
+        get:
+          summary: Get repository catalog
+          responses:
+            '200':
+              description: Success
+
+---
+# Kubernetes API
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: kubernetes-api
+  description: Kubernetes API server
+spec:
+  type: openapi
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: infrastructure
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: Kubernetes API
+      version: 1.28.0
+    paths:
+      /api/v1/namespaces:
+        get:
+          summary: List namespaces
+          responses:
+            '200':
+              description: Success
+
+---
+# Prometheus API
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: prometheus-api
+  description: Prometheus HTTP API
+spec:
+  type: openapi
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: monitoring
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: Prometheus API
+      version: 1.0.0
+    paths:
+      /api/v1/query:
+        get:
+          summary: Instant query
+          responses:
+            '200':
+              description: Success
+
+---
+# Grafana API
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: grafana-api
+  description: Grafana HTTP API
+spec:
+  type: openapi
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: monitoring
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: Grafana API
+      version: 1.0.0
+    paths:
+      /api/dashboards:
+        get:
+          summary: Get dashboards
+          responses:
+            '200':
+              description: Success
+
+---
+# Elasticsearch API
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: elasticsearch-api
+  description: Elasticsearch REST API
+spec:
+  type: openapi
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: monitoring
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: Elasticsearch API
+      version: 8.0.0
+    paths:
+      /_search:
+        get:
+          summary: Search documents
+          responses:
+            '200':
+              description: Success
+
+---
+# Kibana API
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: kibana-api
+  description: Kibana REST API
+spec:
+  type: openapi
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: monitoring
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: Kibana API
+      version: 8.0.0
+    paths:
+      /api/saved_objects:
+        get:
+          summary: Get saved objects
+          responses:
+            '200':
+              description: Success
+
+---
+# 데이터베이스 리소스
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: postgres-database
+  description: PostgreSQL database server
+spec:
+  type: database
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: infrastructure
+
+---
+# Redis 캐시
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: redis-cache
+  description: Redis cache server
+spec:
+  type: cache
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: infrastructure
+
+---
+# Jenkins 스토리지
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: jenkins-storage
+  description: Jenkins persistent storage
+spec:
+  type: storage
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: infrastructure
+
+---
+# 백업 스토리지
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: backup-storage
+  description: Backup storage system
+spec:
+  type: storage
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: infrastructure
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: aws-ecs
+  description: AWS ECS container orchestration
+spec:
+  type: service
+  lifecycle: dev
+  owner: AiSolutionDev2
+  system: infrastructure
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: aws-rds
+  description: AWS RDS database
+spec:
+  type: database
+  lifecycle: production
+  owner: AiSolutionDev2
+  system: infrastructure
