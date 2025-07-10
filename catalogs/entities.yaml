@@ -6,7 +6,7 @@ metadata:
   name: examples
   description: Example system for demonstration
 spec:
-  owner: Service Dev1
+  owner: service-dev-1 # Service Dev1 → service-dev-1
 
 ---
 # DevOps 인프라 시스템
@@ -16,7 +16,7 @@ metadata:
   name: infrastructure
   description: Core infrastructure and DevOps systems
 spec:
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
 
 ---
 # CI/CD 시스템
@@ -26,7 +26,7 @@ metadata:
   name: cicd
   description: Continuous Integration and Deployment system
 spec:
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
 
 ---
 # 모니터링 시스템
@@ -36,7 +36,7 @@ metadata:
   name: monitoring
   description: Application and infrastructure monitoring
 spec:
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
 
 ---
 # 기존 예시 웹사이트
@@ -48,7 +48,7 @@ metadata:
 spec:
   type: website
   lifecycle: experimental
-  owner: Service Dev1
+  owner: service-dev-1 # Service Dev1 → service-dev-1
   system: examples
   providesApis: [example-grpc-api]
 
@@ -64,7 +64,7 @@ metadata:
 spec:
   type: service
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: cicd
   dependsOn: [resource:jenkins-storage]
 
@@ -78,7 +78,7 @@ metadata:
 spec:
   type: service
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: cicd
 
 ---
@@ -91,7 +91,7 @@ metadata:
 spec:
   type: service
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: infrastructure
   providesApis: [docker-registry-api]
 
@@ -107,7 +107,7 @@ metadata:
 spec:
   type: service
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: infrastructure
   consumesApis: [kubernetes-api]
 
@@ -121,7 +121,7 @@ metadata:
 spec:
   type: service
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: monitoring
   providesApis: [prometheus-api]
 
@@ -135,7 +135,7 @@ metadata:
 spec:
   type: service
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: monitoring
   consumesApis: [prometheus-api]
   providesApis: [grafana-api]
@@ -150,7 +150,7 @@ metadata:
 spec:
   type: service
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: monitoring
   providesApis: [elasticsearch-api, kibana-api]
 
@@ -164,7 +164,7 @@ metadata:
 spec:
   type: grpc
   lifecycle: experimental
-  owner: Service Dev2
+  owner: service-dev-2 # Service Dev2 → service-dev-2
   system: examples
   definition: |
     syntax = "proto3";
@@ -187,7 +187,7 @@ metadata:
 spec:
   type: openapi
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: infrastructure
   definition: |
     openapi: 3.0.0
@@ -212,7 +212,7 @@ metadata:
 spec:
   type: openapi
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: infrastructure
   definition: |
     openapi: 3.0.0
@@ -237,7 +237,7 @@ metadata:
 spec:
   type: openapi
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: monitoring
   definition: |
     openapi: 3.0.0
@@ -262,7 +262,7 @@ metadata:
 spec:
   type: openapi
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: monitoring
   definition: |
     openapi: 3.0.0
@@ -287,7 +287,7 @@ metadata:
 spec:
   type: openapi
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: monitoring
   definition: |
     openapi: 3.0.0
@@ -312,7 +312,7 @@ metadata:
 spec:
   type: openapi
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: monitoring
   definition: |
     openapi: 3.0.0
@@ -337,7 +337,7 @@ metadata:
 spec:
   type: database
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: infrastructure
 
 ---
@@ -350,7 +350,7 @@ metadata:
 spec:
   type: cache
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: infrastructure
 
 ---
@@ -363,7 +363,7 @@ metadata:
 spec:
   type: storage
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: infrastructure
 
 ---
@@ -376,7 +376,7 @@ metadata:
 spec:
   type: storage
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: infrastructure
 
 ---
@@ -388,7 +388,7 @@ metadata:
 spec:
   type: service
   lifecycle: dev
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: infrastructure
 
 ---
@@ -400,5 +400,5 @@ metadata:
 spec:
   type: database
   lifecycle: production
-  owner: AI Solution Dev 2
+  owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: infrastructure

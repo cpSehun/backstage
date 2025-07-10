@@ -1,0 +1,35 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: engineering-manager-1
+  description: Engineering Manager 1
+spec:
+  profile:
+    displayName: Engineering Manager 1
+    email: engmanager1@coinplug.com
+  memberOf: [cplabs, engineering-managers]
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: product-manager-1
+  description: Product Manager 1
+spec:
+  profile:
+    displayName: Product Manager 1
+    email: pm1@coinplug.com
+  memberOf: [cplabs, product-managers]
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: executive-1
+  description: Executive 1
+spec:
+  profile:
+    displayName: Executive 1
+    email: exec1@coinplug.com
+  memberOf: [cplabs, executives]

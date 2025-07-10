@@ -2,79 +2,83 @@
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: CPLABS
+  name: cplabs
   description: All CPLABS employees
 spec:
   type: organization
   children:
-    [
-      AI Solution Dev 1,
-      AI Solution Dev 2,
-      Service Dev 1,
-      Service Dev 2,
-      Daepa Dev,
-      LAB,
-    ]
+    - ai-solution-dev-1
+    - ai-solution-dev-2
+    - service-dev-1
+    - service-dev-2
+    - daepa-dev
+    - lab
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: AI Solution Dev 1
+  name: ai-solution-dev-1
   description: AI Solution Dev 1 team
 spec:
-  namespace: labatory
+  # namespace: labatory 제거 (default 네임스페이스 사용)
   type: team
-  parent: CPLABS
+  parent: cplabs
+  children: []
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: AI Solution Dev 2
+  name: ai-solution-dev-2
   description: AI Solution Dev 2 team
 spec:
-  namespace: labatory
+  # namespace: labatory 제거
   type: team
-  parent: CPLABS
+  parent: cplabs
+  children: []
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: Service Dev 1
+  name: service-dev-1
   description: Service Dev 1 team
 spec:
-  namespace: labatory
+  # namespace: labatory 제거
   type: team
-  parent: CPLABS
+  parent: cplabs
+  children: []
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: Service Dev 2
+  name: service-dev-2
   description: Service Dev 2 team
 spec:
-  namespace: labatory
+  # namespace: labatory 제거
   type: team
-  parent: CPLABS
+  parent: cplabs
+  children: []
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: DaePa Dev
+  name: daepa-dev
   description: DaePa Dev team
 spec:
-  namespace: labatory
+  # namespace: labatory 제거
   type: team
-  parent: CPLABS
+  parent: cplabs
+  children: []
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: LAB
-  description: LABATORY
+  name: lab
+  description: LABATORY team
 spec:
-  namespace: labatory
+  # namespace: labatory 제거
   type: team
-  parent: CPLABS
+  parent: cplabs
+  children: []
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
@@ -83,11 +87,12 @@ metadata:
   description: Management team
 spec:
   type: team
-  parent: CPLABS
-  children: [engineering-managers, product-managers, executives]
+  parent: cplabs
+  children:
+    - engineering-managers
+    - product-managers
+    - executives
 
----
-# 관리팀 하위 그룹들
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
@@ -97,6 +102,7 @@ metadata:
 spec:
   type: role
   parent: managers
+  children: []
 
 ---
 apiVersion: backstage.io/v1alpha1
@@ -107,6 +113,7 @@ metadata:
 spec:
   type: role
   parent: managers
+  children: []
 
 ---
 apiVersion: backstage.io/v1alpha1
@@ -117,3 +124,4 @@ metadata:
 spec:
   type: role
   parent: managers
+  children: []

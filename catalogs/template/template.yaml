@@ -5,7 +5,7 @@ metadata:
   title: Example Node.js Template
   description: An example template for the scaffolder that creates a simple Node.js service
 spec:
-  owner: AISolutionDev2
+  owner: ai-solution-dev-2 # AISolutionDev2 → ai-solution-dev-2
   type: service
 
   parameters:
