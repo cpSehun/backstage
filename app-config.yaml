@@ -88,11 +88,12 @@ scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
 
 catalog:
+  processingInterval: { seconds: 5 }
   import:
     entityFilename: catalog-info.yaml
     pullRequestBranchName: backstage-integration
   rules:
-    - allow: [Component, System, API, Resource, Location]
+    - allow: [Component, System, API, Resource, Location, Group, User, Template]
   locations:
     # 절대 경로 사용 (Docker 컨테이너 내부 기준)
     - type: file
@@ -104,14 +105,9 @@ catalog:
       rules:
         - allow: [Group]
 
-    # 사용자 파일들 (각각 개별 등록)
+    # 사용자 파일들 (폴더 단위로 통합)
     - type: file
       target: /app/catalogs/org/users/developers.yaml
-      rules:
-        - allow: [User]
-
-    - type: file
-      target: /app/catalogs/org/users/managers.yaml
       rules:
         - allow: [User]
 

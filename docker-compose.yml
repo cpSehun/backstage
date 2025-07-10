@@ -18,6 +18,11 @@ services:
       - '7007:7007'
     depends_on:
       - postgres
+    volumes:
+      - ./app-config.yaml:/app/app-config.yaml
+      - ./catalogs:/app/catalogs
+      - ./packages:/app/packages
+      - ./plugins:/app/plugins
 
 volumes:
   postgres_data:

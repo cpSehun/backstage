@@ -7,6 +7,8 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+cd ../../
+
 echo -e "${BLUE}🔨 Simple build (root user)...${NC}"
 
 if docker compose -f docker-compose-build.yml run --rm --user root backstage-builder bash -c "

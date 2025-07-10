@@ -3,7 +3,7 @@ services:
   backstage-builder:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.build
     env_file:
       - .env
     volumes:

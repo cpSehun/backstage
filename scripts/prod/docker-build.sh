@@ -8,6 +8,8 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+cd ../../
+
 # 에러 핸들링 함수
 handle_error() {
     echo -e "${RED}❌ Error occurred at line $1${NC}"
