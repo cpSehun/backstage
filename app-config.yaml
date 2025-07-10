@@ -88,6 +88,7 @@ scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
 
 catalog:
+  ## dev환경에서 실시간 적용을 위해 5초로 설정 !! 운영 환경에선 변경 필요
   processingInterval: { seconds: 5 }
   import:
     entityFilename: catalog-info.yaml
