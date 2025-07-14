@@ -39,15 +39,21 @@ backend:
   # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
 
 integrations:
-  github:
-    - host: github.com
-      # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
-      # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
-      token: ${GITHUB_TOKEN}
-    ### Example for how to add your GitHub Enterprise instance using the API:
-    # - host: ghe.example.net
-    #   apiBaseUrl: https://ghe.example.net/api/v3
-    #   token: ${GHE_TOKEN}
+  bitbucketCloud:
+    - username: ${BITBUCKET_CLOUD_USERNAME}
+      password: ${BITBUCKET_CLOUD_APP_PASSWORD}
+
+      # This is a Bitbucket Cloud App Password, you can find out how to generate this token, and more information
+      # about setting up the Bitbucket Cloud integration here: https://backstage.io/docs/integrations/bitbucket-cloud/locations#configuration
+  # github:
+  #   - host: github.com
+  #     # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
+  #     # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
+  #     token: ${GITHUB_TOKEN}
+  #   ### Example for how to add your GitHub Enterprise instance using the API:
+  #   # - host: ghe.example.net
+  #   #   apiBaseUrl: https://ghe.example.net/api/v3
+  #   #   token: ${GHE_TOKEN}
 
 proxy:
   ### Example for how to add a proxy endpoint for the frontend.
@@ -106,7 +112,7 @@ catalog:
       rules:
         - allow: [Group]
 
-    # 사용자 파일들 (폴더 단위로 통합)
+    # 사용자 파일들
     - type: file
       target: /app/catalogs/org/users/developers.yaml
       rules:
@@ -118,6 +124,14 @@ catalog:
       rules:
         - allow: [Template]
   useUrlReadersSearch: true
+
+  providers:
+    bitbucketCloud:
+      yourProviderId:
+        workspace: coinplugin
+        schedule:
+          frequency: { minutes: 30 } # How often to poll for changes, defaults to 5 minutes
+          timeout: { seconds: 3 } # How long to wait for a response from the provider, defaults to 30 seconds
 
 kubernetes:
   # see https://backstage.io/docs/features/kubernetes/configuration for kubernetes configuration options

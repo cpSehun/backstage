@@ -20,7 +20,6 @@ metadata:
   name: ai-solution-dev-1
   description: AI Solution Dev 1 team
 spec:
-  # namespace: labatory 제거 (default 네임스페이스 사용)
   type: team
   parent: cplabs
   children: []
@@ -31,7 +30,6 @@ metadata:
   name: ai-solution-dev-2
   description: AI Solution Dev 2 team
 spec:
-  # namespace: labatory 제거
   type: team
   parent: cplabs
   children: []
@@ -42,7 +40,6 @@ metadata:
   name: service-dev-1
   description: Service Dev 1 team
 spec:
-  # namespace: labatory 제거
   type: team
   parent: cplabs
   children: []
@@ -53,7 +50,6 @@ metadata:
   name: service-dev-2
   description: Service Dev 2 team
 spec:
-  # namespace: labatory 제거
   type: team
   parent: cplabs
   children: []
@@ -64,7 +60,6 @@ metadata:
   name: daepa-dev
   description: DaePa Dev team
 spec:
-  # namespace: labatory 제거
   type: team
   parent: cplabs
   children: []
@@ -73,55 +68,10 @@ apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
   name: lab
-  description: LABATORY team
-spec:
-  # namespace: labatory 제거
-  type: team
-  parent: cplabs
-  children: []
----
-apiVersion: backstage.io/v1alpha1
-kind: Group
-metadata:
-  name: managers
-  description: Management team
+  description: LABATORY
 spec:
   type: team
   parent: cplabs
-  children:
-    - engineering-managers
-    - product-managers
-    - executives
-
----
-apiVersion: backstage.io/v1alpha1
-kind: Group
-metadata:
-  name: engineering-managers
-  description: Engineering managers
-spec:
-  type: role
-  parent: managers
   children: []
-
 ---
-apiVersion: backstage.io/v1alpha1
-kind: Group
-metadata:
-  name: product-managers
-  description: Product managers
-spec:
-  type: role
-  parent: managers
-  children: []
 
----
-apiVersion: backstage.io/v1alpha1
-kind: Group
-metadata:
-  name: executives
-  description: Executive team
-spec:
-  type: role
-  parent: managers
-  children: []
