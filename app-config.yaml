@@ -41,7 +41,7 @@ backend:
 integrations:
   bitbucketCloud:
     - username: ${BITBUCKET_CLOUD_USERNAME}
-      password: ${BITBUCKET_CLOUD_APP_PASSWORD}
+      appPassword: ${BITBUCKET_CLOUD_APP_PASSWORD}
 
       # This is a Bitbucket Cloud App Password, you can find out how to generate this token, and more information
       # about setting up the Bitbucket Cloud integration here: https://backstage.io/docs/integrations/bitbucket-cloud/locations#configuration

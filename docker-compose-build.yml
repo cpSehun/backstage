@@ -10,7 +10,7 @@ services:
       - .:/app # 소스 코드 마운트
       - node_modules_cache:/app/node_modules # node_modules 캐시 (권한 문제 해결)
     working_dir: /app
-    user: root # 권한 문제 해결을 위해 root로 실행
+    user: node
 
 volumes:
   node_modules_cache:
