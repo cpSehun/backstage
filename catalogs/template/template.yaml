@@ -30,6 +30,7 @@ spec:
           ui:field: RepoUrlPicker
           ui:options:
             allowedHosts:
+              - bitbucket.org
               - github.com
 
   steps:
@@ -43,9 +44,8 @@ spec:
 
     - id: publish
       name: Publish
-      action: publish:github
+      action: publish:bitbucketCloud
       input:
-        allowedHosts: ['github.com']
         description: This is ${{ parameters.name }}
         repoUrl: ${{ parameters.repoUrl }}
         defaultBranch: 'main'

@@ -1,8 +1,9 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: ${{ values.name | dump }}
+  name: backstage-plugin-events-backend-module-bitbucket-cloud
+  title: '@backstage/plugin-events-backend-module-bitbucket-cloud'
 spec:
-  type: service
-  owner: ai-solution-dev-2 # user:guest → ai-solution-dev-2 (적절한 그룹으로 변경)
   lifecycle: experimental
+  type: backstage-backend-plugin-module
+  owner: maintainers

@@ -13,47 +13,46 @@ const backend = createBackend();
 backend.add(import('@backstage/plugin-app-backend'));
 backend.add(import('@backstage/plugin-proxy-backend'));
 backend.add(import('@backstage/plugin-scaffolder-backend'));
-backend.add(import('@backstage/plugin-scaffolder-backend-module-github'));
+
+// --- FIX: Add Bitbucket Cloud Scaffolder modules ---
+// This module provides the base functionality for Bitbucket Cloud actions.
+backend.add(
+  import('@backstage/plugin-scaffolder-backend-module-bitbucket-cloud'),
+);
+// The custom scaffolder module was causing an error and is likely redundant.
+// It has been removed to rely on the official module above.
+// --- END FIX ---
+
 backend.add(import('@backstage/plugin-techdocs-backend'));
 
 // auth plugin
 backend.add(import('@backstage/plugin-auth-backend'));
 backend.add(import('@backstage/plugin-auth-backend-module-google-provider'));
-// See https://backstage.io/docs/backend-system/building-backends/migrating#the-auth-plugin
 backend.add(import('@backstage/plugin-auth-backend-module-guest-provider'));
-// See https://backstage.io/docs/auth/guest/provider
 
 // catalog plugin
 backend.add(import('@backstage/plugin-catalog-backend'));
 backend.add(
   import('@backstage/plugin-catalog-backend-module-scaffolder-entity-model'),
 );
-
-// See https://backstage.io/docs/features/software-catalog/configuration#subscribing-to-catalog-errors
 backend.add(import('@backstage/plugin-catalog-backend-module-logs'));
 
 // permission plugin
 backend.add(import('@backstage/plugin-permission-backend'));
-// See https://backstage.io/docs/permissions/getting-started for how to create your own permission policy
 backend.add(
   import('@backstage/plugin-permission-backend-module-allow-all-policy'),
 );
 
 // search plugin
 backend.add(import('@backstage/plugin-search-backend'));
-
-// search engine
-// See https://backstage.io/docs/features/search/search-engines
 backend.add(import('@backstage/plugin-search-backend-module-pg'));
-
-// search collators
 backend.add(import('@backstage/plugin-search-backend-module-catalog'));
 backend.add(import('@backstage/plugin-search-backend-module-techdocs'));
 
 // kubernetes
 backend.add(import('@backstage/plugin-kubernetes-backend'));
 
-// Bitbucket Cloud
+// Bitbucket Cloud (non-scaffolder modules)
 backend.add(import('@backstage/plugin-events-backend-module-bitbucket-cloud'));
 backend.add(import('@backstage/plugin-catalog-backend-module-bitbucket-cloud'));
 
