@@ -9,29 +9,36 @@ spec:
   type: service
 
   parameters:
-    - title: Fill in some steps
+    - title: Fill in repository details
       required:
-        - name
+        - component_id
+        - workspace
+        - projectKey
       properties:
-        name:
-          title: Name
+        component_id:
+          title: Repository Name
           type: string
-          description: Unique name of the component
+          description: Unique name of the new repository
           ui:autofocus: true
-          ui:options:
-            rows: 5
-    - title: Choose a location
-      required:
-        - repoUrl
-      properties:
-        repoUrl:
-          title: Repository Location
+        workspace:
+          title: Bitbucket Workspace
           type: string
-          ui:field: RepoUrlPicker
-          ui:options:
-            allowedHosts:
-              - bitbucket.org
-              - github.com
+          description: The ID of the Bitbucket Workspace where the repository will be created.
+          # 기본 워크스페이스 값을 지정합니다.
+          default: 'coinplugin'
+        projectKey:
+          title: Bitbucket Project Key
+          type: string
+          description: The key of the Bitbucket project (e.g., 'PROJ').
+          # enum을 사용하여 드롭다운 메뉴를 생성합니다.
+          enum:
+            - 'DEVOPS'
+            - 'REC'
+            - 'ECO'
+        description:
+          title: Description
+          type: string
+          description: A description for the new repository.
 
   steps:
     - id: fetch-base
@@ -40,14 +47,17 @@ spec:
       input:
         url: ./content
         values:
-          name: ${{ parameters.name }}
+          name: ${{ parameters.component_id }}
+          description: ${{ parameters.description }}
 
     - id: publish
       name: Publish
       action: publish:bitbucketCloud
       input:
-        description: This is ${{ parameters.name }}
-        repoUrl: ${{ parameters.repoUrl }}
+        # Construct the repoUrl using a special format that the backend understands.
+        # This explicitly provides the workspace, project and repository name.
+        repoUrl: bitbucket.org?workspace=${{ parameters.workspace }}&project=${{ parameters.projectKey }}&repo=${{ parameters.component_id }}
+        description: ${{ parameters.description }}
         defaultBranch: 'main'
 
     - id: register

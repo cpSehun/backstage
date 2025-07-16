@@ -1,9 +1,17 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: backstage-plugin-events-backend-module-bitbucket-cloud
-  title: '@backstage/plugin-events-backend-module-bitbucket-cloud'
+  # 템플릿으로부터 전달받은 'name' 값을 사용합니다.
+  name: ${{ values.name }}
+  # 템플릿으로부터 전달받은 'description' 값을 사용합니다.
+  description: ${{ values.description | default('No description provided') }}
+  annotations:
+    # 이 어노테이션은 Backstage가 이 컴포넌트를 Bitbucket 저장소와 연결하는 데 필수적입니다.
+    bitbucket.org/project-key: ${{ parameters.projectKey }}
+    # FIX: repo-slug 형식을 '워크스페이스/저장소이름'으로 수정합니다.
+    bitbucket.org/repo-slug: ${{ parameters.workspace }}/${{ parameters.component_id }}
 spec:
+  type: service
   lifecycle: experimental
-  type: backstage-backend-plugin-module
-  owner: maintainers
+  # 템플릿의 spec 섹션에 정의된 owner를 사용합니다.
+  owner: ${{ spec.owner }}
