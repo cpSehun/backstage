@@ -23,7 +23,10 @@ COPY --chown=node:node plugins/ ./plugins/
 COPY --chown=node:node catalogs/ ./catalogs/
 
 # This disables node snapshot for Node 20 to work with the Scaffolder
+ENV NODE_ENV=development
 ENV NODE_OPTIONS="--no-node-snapshot"
+ENV HOST=0.0.0.0
+
 
 # Install dependencies using the lockfile.
 # This will now install a fresh, clean node_modules inside the image,
