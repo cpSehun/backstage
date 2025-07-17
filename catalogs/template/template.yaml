@@ -20,17 +20,17 @@ spec:
           type: string
           description: Unique name of the new repository
           ui:autofocus: true
+          # 고유성을 위한 패턴 추가
+          pattern: '^[a-z0-9-]+$'
         workspace:
           title: Bitbucket Workspace
           type: string
           description: The ID of the Bitbucket Workspace where the repository will be created.
-          # 기본 워크스페이스 값을 지정합니다.
           default: 'coinplugin'
         projectKey:
           title: Bitbucket Project Key
           type: string
           description: The key of the Bitbucket project (e.g., 'PROJ').
-          # enum을 사용하여 드롭다운 메뉴를 생성합니다.
           enum:
             - 'DEVOPS'
             - 'REC'
@@ -54,8 +54,6 @@ spec:
       name: Publish
       action: publish:bitbucketCloud
       input:
-        # Construct the repoUrl using a special format that the backend understands.
-        # This explicitly provides the workspace, project and repository name.
         repoUrl: bitbucket.org?workspace=${{ parameters.workspace }}&project=${{ parameters.projectKey }}&repo=${{ parameters.component_id }}
         description: ${{ parameters.description }}
         defaultBranch: 'main'
@@ -66,6 +64,8 @@ spec:
       input:
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
         catalogInfoPath: '/catalog-info.yaml'
+        # 선택적: 기존 엔트리가 있으면 업데이트
+        optional: true
 
   output:
     links:

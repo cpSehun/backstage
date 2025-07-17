@@ -14,8 +14,8 @@ services:
     env_file:
       - .env
     ports:
-      - '3001:7007'
-      - '7007:7007'
+      - '3000:3000' # 프론트엔드 개발 서버
+      - '7007:7007' # 백엔드 API 서버
     depends_on:
       - postgres
     volumes:
@@ -23,6 +23,5 @@ services:
       - ./catalogs:/app/catalogs
       - ./packages:/app/packages
       - ./plugins:/app/plugins
-
 volumes:
   postgres_data:
