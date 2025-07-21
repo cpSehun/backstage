@@ -23,7 +23,8 @@ backend:
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
     # Default Helmet Content-Security-Policy values can be removed by setting the key to false
   cors:
-    origin: ${FRONTEND_BASE_URL}
+    origin: ${BACKEND_BASE_URL}
+    # origin: ${FRONTEND_BASE_URL}
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
   # This is for local development only, it is not recommended to use this in production
@@ -37,7 +38,6 @@ backend:
       port: ${POSTGRES_PORT}
       user: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
-      database: ${POSTGRES_DB}
   # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
 
 integrations:
@@ -102,25 +102,25 @@ catalog:
   rules:
     - allow: [Component, System, API, Resource, Location, Group, User, Template]
   locations:
-    # 백엔드 기준 상대 경로 (packages/backend에서 실행됨)
+    # 절대 경로 사용 (Docker 컨테이너 내부 기준)
     - type: file
-      target: ../../catalogs/entities.yaml
+      target: /app/catalogs/entities.yaml
 
     # 그룹 정보
     - type: file
-      target: ../../catalogs/org/groups.yaml
+      target: /app/catalogs/org/groups.yaml
       rules:
         - allow: [Group]
 
     # 사용자 파일들
     - type: file
-      target: ../../catalogs/org/users/developers.yaml
+      target: /app/catalogs/org/users/developers.yaml
       rules:
         - allow: [User]
 
     # 템플릿
     - type: file
-      target: ../../catalogs/template/template.yaml
+      target: /app/catalogs/template/template.yaml
       rules:
         - allow: [Template]
   useUrlReadersSearch: true

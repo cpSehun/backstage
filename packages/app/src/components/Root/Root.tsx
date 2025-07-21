@@ -28,7 +28,6 @@ import SearchIcon from '@material-ui/icons/Search';
 import { MyGroupsSidebarItem } from '@backstage/plugin-org';
 import GroupIcon from '@material-ui/icons/People';
 
-
 const useSidebarLogoStyles = makeStyles({
   root: {
     width: sidebarConfig.drawerWidthClosed,
@@ -50,12 +49,7 @@ const SidebarLogo = () => {
 
   return (
     <div className={classes.root}>
-      <Link
-        to="/"
-        underline="none"
-        className={classes.link}
-        aria-label="Home"
-      >
+      <Link to="/" underline="none" className={classes.link} aria-label="Home">
         {isOpen ? <LogoFull /> : <LogoIcon />}
       </Link>
     </div>
