@@ -6,6 +6,7 @@ services:
     ports:
       - 5432:5432
 
+  # 메인 Backstage 서비스
   backstage:
     build:
       context: .
@@ -14,14 +15,11 @@ services:
     env_file:
       - .env
     ports:
-      - '3000:3000' # 프론트엔드 개발 서버
-      - '7007:7007' # 백엔드 API 서버
+      - '7007:7007'
+    # volumes:
+    #   - .:/app  # 실시간 코드 반영
+    #   - /app/node_modules  # node_modules 보호
     depends_on:
       - postgres
-    volumes:
-      - ./app-config.yaml:/app/app-config.yaml
-      - ./catalogs:/app/catalogs
-      - ./packages:/app/packages
-      - ./plugins:/app/plugins
 volumes:
   postgres_data:

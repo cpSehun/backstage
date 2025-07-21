@@ -1,10 +1,5 @@
-# [Backstage](https://backstage.io)
+[Docker 환경]
+Front 코드 수정 후 docker-compose up --build -d backstage
+Backend 코드 수정후 docker-compose restart backstage
 
-This is your newly scaffolded Backstage App, Good Luck!
 
-To start the app, run:
-
-```sh
-yarn install
-yarn start
-```
