@@ -12,6 +12,7 @@ spec:
     - title: Fill in repository details
       required:
         - component_id
+        - owner
         - workspace
         - projectKey
       properties:
@@ -22,6 +23,14 @@ spec:
           ui:autofocus: true
           # 고유성을 위한 패턴 추가
           pattern: '^[a-z0-9-]+$'
+        owner: # <-- owner 파라미터 정의 추가
+          title: Owner
+          type: string
+          description: Owner of the component. Must be a registered user or group in the catalog.
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              kind: [Group, User]
         workspace:
           title: Bitbucket Workspace
           type: string
@@ -49,6 +58,7 @@ spec:
         values:
           name: ${{ parameters.component_id }}
           description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }} # <-- owner 값을 content에 전달
 
     - id: publish
       name: Publish

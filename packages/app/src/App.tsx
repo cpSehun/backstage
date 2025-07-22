@@ -38,6 +38,9 @@ import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/
 //추가 구글 plugin
 import { googleAuthApiRef } from '@backstage/core-plugin-api';
 
+//추가 Auto Logout
+import { AutoLogout } from '@backstage/core-components';
+
 const app = createApp({
   apis,
   bindRoutes({ bind }) {
@@ -115,9 +118,17 @@ const routes = (
 export default app.createRoot(
   <>
     <AlertDisplay />
+    <AutoLogout
+      idleTimeoutMinutes={30}
+      useWorkerTimers={false}
+      logoutIfDisconnected={false}
+    />
+
     <OAuthRequestDialog />
     <AppRouter>
       <Root>{routes}</Root>
     </AppRouter>
   </>,
 );
+
+

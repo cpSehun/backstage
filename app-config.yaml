@@ -37,7 +37,6 @@ backend:
       port: ${POSTGRES_PORT}
       user: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
-      database: ${POSTGRES_DB}
   # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
 
 integrations:
@@ -91,6 +90,8 @@ auth:
           resolvers:
             # See https://backstage.io/docs/auth/google/provider#resolvers for more resolvers
             - resolver: emailLocalPartMatchingUserEntityName
+  autologout:
+    enabled: true
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
@@ -130,8 +131,8 @@ catalog:
       yourProviderId:
         workspace: coinplugin
         schedule:
-          frequency: { minutes: 30 } # How often to poll for changes, defaults to 5 minutes
-          timeout: { seconds: 3 } # How long to wait for a response from the provider, defaults to 30 seconds
+          frequency: { minutes: 5 }
+          timeout: { minutes: 3 }
 
 kubernetes:
   # see https://backstage.io/docs/features/kubernetes/configuration for kubernetes configuration options

@@ -2,12 +2,9 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: ${{ values.name }}
-  description: ${{ values.description | default('No description provided') }}
-  annotations:
-    # 문자열로 명시적으로 설정
-    bitbucket.org/project-key: '${{ parameters.projectKey }}'
-    bitbucket.org/repo-slug: '${{ parameters.workspace }}/${{ parameters.component_id }}'
+  description: ${{ values.description }}
+  system: 
 spec:
   type: service
-  lifecycle: experimental
-  owner: ${{ spec.owner }}
+  lifecycle: dev
+  owner: ${{ values.owner }} # <-- 전달받은 owner 값을 사용
