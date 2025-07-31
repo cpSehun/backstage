@@ -37,6 +37,13 @@ backend:
       port: ${POSTGRES_PORT}
       user: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
+
+    auditor:
+    severityLogLevelMappings:
+      low: debug # 문제 해결용
+      medium: debug # 정상 작업 확인
+      high: warn # 문제 상황 알림
+      critical: error # 심각한 문제
   # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
 
 integrations:
@@ -96,30 +103,36 @@ auth:
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
 
+## 웹훅 임시 주석(public IP없음)
+# events:
+#   http:
+#     topics:
+#       - bitbucketCloud
+#   modules:
+#     bitbucketCloud:
+#       webhookSecret: ${BITBUCKET_WEBHOOK_SECRET}
+
 catalog:
   # import:
   #   entityFilename: catalog-info.yaml
   #   pullRequestBranchName: backstage-integration
+  processingInterval: { minutes: 30 }
   rules:
     - allow: [Component, System, API, Resource, Location, Group, User, Template]
   locations:
-    # 백엔드 기준 상대 경로 (packages/backend에서 실행됨)
     - type: file
       target: ../../catalogs/entities.yaml
 
-    # 그룹 정보
     - type: file
       target: ../../catalogs/org/groups.yaml
       rules:
         - allow: [Group]
 
-    # 사용자 파일들
     - type: file
       target: ../../catalogs/org/users/developers.yaml
       rules:
         - allow: [User]
 
-    # 템플릿
     - type: file
       target: ../../catalogs/template/template.yaml
       rules:

@@ -52,8 +52,12 @@ backend.add(import('@backstage/plugin-search-backend-module-techdocs'));
 // kubernetes
 backend.add(import('@backstage/plugin-kubernetes-backend'));
 
+// Events 플러그인 추가
+backend.add(import('@backstage/plugin-events-backend'));
+
 // Bitbucket Cloud (non-scaffolder modules)
 backend.add(import('@backstage/plugin-events-backend-module-bitbucket-cloud'));
 backend.add(import('@backstage/plugin-catalog-backend-module-bitbucket-cloud'));
 
 backend.start();
+
