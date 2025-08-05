@@ -21,22 +21,19 @@ pipelines:
           - pip
         script:
           - echo "Building and testing ${{ values.name }} application..."
-
-          # Frontend build test
+          - echo "Frontend build test"
           - echo "Testing Frontend build..."
           - cd frontend
           - npm ci
           - npm run build
           - cd ..
-
-          # Backend build test
+          - echo "Backend build test"
           - echo "Testing Backend build..."
           - cd backend
           - pip install -r requirements.txt
           - python -m pytest --version || echo "No tests found, continuing..."
           - cd ..
-
-          # Docker build test
+          - echo "Docker build test"
           - echo "Testing Docker builds..."
           - docker build -t test-frontend ./frontend
           - docker build -t test-backend ./backend
@@ -51,22 +48,18 @@ pipelines:
             - terraform
           script:
             - echo "Planning AWS infrastructure for ${{ values.name }}..."
-
-            # Install Terraform
+            - echo "Installing Terraform..."
             - apt-get update && apt-get install -y curl unzip
             - curl -fsSL https://releases.hashicorp.com/terraform/1.7.0/terraform_1.7.0_linux_amd64.zip -o terraform.zip
             - unzip terraform.zip && mv terraform /usr/local/bin/
             - terraform version
-
-            # Install AWS CLI
+            - echo "Installing AWS CLI..."
             - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             - unzip awscliv2.zip && ./aws/install
-
-            # Copy terraform files and initialize
+            - echo "Copying terraform files and initializing..."
             - cp -r terraform/* ./
             - terraform init
-
-            # Create terraform.tfvars
+            - echo "Creating terraform.tfvars..."
             - |
               cat > terraform.tfvars << EOF
               project_name = "${{ values.name }}"
@@ -75,12 +68,10 @@ pipelines:
               key_name = "$AWS_KEY_NAME"
               db_password = "$DB_PASSWORD"
               EOF
-
-            # Plan infrastructure
+            - echo "Planning infrastructure..."
             - terraform plan -var-file="terraform.tfvars" -out=tfplan
             - terraform show -no-color tfplan > tfplan.txt
-
-            # Save plan
+            - echo "Saving plan..."
             - tar -czf terraform-plan.tar.gz tfplan .terraform/ terraform.tfvars
           artifacts:
             - terraform-plan.tar.gz
@@ -93,21 +84,17 @@ pipelines:
             - terraform
           script:
             - echo "Deploying AWS infrastructure for ${{ values.name }}..."
-
-            # Install tools
+            - echo "Installing tools..."
             - apt-get update && apt-get install -y curl unzip
             - curl -fsSL https://releases.hashicorp.com/terraform/1.7.0/terraform_1.7.0_linux_amd64.zip -o terraform.zip
             - unzip terraform.zip && mv terraform /usr/local/bin/
             - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             - unzip awscliv2.zip && ./aws/install
-
-            # Restore terraform plan
+            - echo "Restoring terraform plan..."
             - tar -xzf terraform-plan.tar.gz
-
-            # Apply infrastructure
+            - echo "Applying infrastructure..."
             - terraform apply -auto-approve tfplan
-
-            # Get outputs
+            - echo "Getting outputs..."
             - terraform output -json > terraform-outputs.json
             - echo "Infrastructure deployed successfully!"
             - terraform output
@@ -120,14 +107,12 @@ pipelines:
             - docker
           script:
             - echo "Building application images for ${{ values.name }}..."
-
-            # Build images with tags
+            - echo "Building images with tags..."
             - docker build -t ${{ values.name }}-frontend:${BITBUCKET_COMMIT::8} ./frontend
             - docker build -t ${{ values.name }}-backend:${BITBUCKET_COMMIT::8} ./backend
             - docker tag ${{ values.name }}-frontend:${BITBUCKET_COMMIT::8} ${{ values.name }}-frontend:latest
             - docker tag ${{ values.name }}-backend:${BITBUCKET_COMMIT::8} ${{ values.name }}-backend:latest
-
-            # Save images as tar files for deployment
+            - echo "Saving images as tar files for deployment..."
             - docker save ${{ values.name }}-frontend:latest > frontend-image.tar
             - docker save ${{ values.name }}-backend:latest > backend-image.tar
 
@@ -140,12 +125,10 @@ pipelines:
           name: 🚁 Deploy Application
           script:
             - echo "Deploying ${{ values.name }} to AWS EC2..."
-
-            # Install AWS CLI
+            - echo "Installing AWS CLI..."
             - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             - unzip awscliv2.zip && ./aws/install
-
-            # Find EC2 instance
+            - echo "Finding EC2 instance..."
             - |
               INSTANCE_ID=$(aws ec2 describe-instances \
                 --filters "Name=tag:Name,Values=${{ values.name }}-instance" "Name=instance-state-name,Values=running" \
@@ -158,8 +141,7 @@ pipelines:
               fi
 
               echo "Found EC2 instance: $INSTANCE_ID"
-
-            # Create deployment package
+            - echo "Creating deployment package..."
             - |
               cat > deploy-app.sh << 'EOF'
               #!/bin/bash
@@ -200,8 +182,7 @@ pipelines:
               EOF
 
               chmod +x deploy-app.sh
-
-            # Create production docker-compose
+            - echo "Creating production docker-compose..."
             - |
               cat > docker-compose.prod.yml << 'EOF'
               version: '3.8'
@@ -230,8 +211,7 @@ pipelines:
                     timeout: 10s
                     retries: 3
               EOF
-
-            # Get RDS endpoint from terraform outputs
+            - echo "Getting RDS endpoint from terraform outputs..."
             - |
               if [ -f "terraform-outputs.json" ]; then
                 RDS_ENDPOINT=$(cat terraform-outputs.json | grep -o '"rds_endpoint":{"value":"[^"]*"' | cut -d'"' -f4)
@@ -240,9 +220,7 @@ pipelines:
                 echo "Warning: No terraform outputs found, using default RDS endpoint"
                 RDS_ENDPOINT="localhost"
               fi
-
-            # Note: In a real scenario, you would use AWS Systems Manager Session Manager
-            # or another secure method to deploy to EC2. This is a simplified example.
+            - echo "Note: In a real scenario, you would use AWS Systems Manager Session Manager or another secure method to deploy to EC2. This is a simplified example."
             - echo "Deployment package prepared for EC2 instance: $INSTANCE_ID"
             - echo "Files ready: deploy-app.sh, docker-compose.prod.yml, frontend-image.tar, backend-image.tar"
             - echo "🎉 Deployment completed! Check your EC2 instance and Load Balancer URL."
@@ -258,26 +236,21 @@ pipelines:
             - pip
           script:
             - echo "Testing Pull Request for ${{ values.name }}..."
-
-            # Frontend tests
+            - echo "Running frontend tests..."
             - cd frontend && npm ci && npm run build && cd ..
-
-            # Backend tests
+            - echo "Running backend tests..."
             - cd backend && pip install -r requirements.txt && cd ..
-
-            # Docker build tests
+            - echo "Running Docker build tests..."
             - docker build -t test-frontend ./frontend
             - docker build -t test-backend ./backend
-
-            # Integration test with docker-compose
+            - echo "Running integration test with docker-compose..."
             - docker-compose up -d postgres
             - sleep 20
             - docker-compose up -d backend
             - sleep 30
             - docker-compose up -d frontend
             - sleep 10
-
-            # Simple health check
+            - echo "Running simple health check..."
             - timeout 60 bash -c 'until curl -f http://localhost:8000/health; do sleep 2; done' || echo "Backend not ready, continuing..."
 
             - echo "✅ PR tests completed!"
