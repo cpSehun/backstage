@@ -64,7 +64,7 @@ spec:
       name: Publish
       action: publish:bitbucketCloud
       input:
-        repoUrl: bitbucket.org?workspace=${{ parameters.workspace }}&project=${{ parameters.projectKey }}&repo=${{ parameters.component_id }}
+        repoUrl: bitbucket.org?workspace=WORKSPACE_ID&project=PROJECT_KEY&repo=REPO_NAME
         description: ${{ parameters.description }}
         defaultBranch: 'main'
 

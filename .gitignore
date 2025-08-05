@@ -54,3 +54,16 @@ e2e-test-report/
 
 # Cache
 .cache/
+
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+*.tfvars
+terraform.tfvars
+*.auto.tfvars
+crash.log
+override.tf
+override.tf.json

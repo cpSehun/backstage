@@ -1,0 +1,27 @@
+# FastAPI and dependencies
+fastapi==0.109.2
+uvicorn[standard]==0.27.1
+
+# Database
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.25
+alembic==1.13.1
+
+# Environment and configuration
+python-dotenv==1.0.1
+pydantic==2.6.1
+pydantic-settings==2.1.0
+
+# CORS and middleware
+python-multipart==0.0.9
+
+# Date and time
+python-dateutil==2.8.2
+
+# Logging and monitoring
+structlog==24.1.0
+
+# Testing (optional, for development)
+pytest==8.0.0
+pytest-asyncio==0.23.5
+httpx==0.26.0

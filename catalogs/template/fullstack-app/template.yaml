@@ -1,0 +1,196 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: fullstack-aws-app
+  title: 🚀 Full Stack AWS Application
+  description: Next.js frontend + Python backend + PostgreSQL database deployed on AWS with Terraform
+  tags:
+    - nextjs
+    - python
+    - postgresql
+    - aws
+    - terraform
+    - docker
+    - bitbucket
+  links:
+    - title: Documentation
+      url: https://docs.cplabs.com/fullstack-template
+      icon: docs
+
+spec:
+  owner: ai-solution-dev-2
+  type: service
+
+  parameters:
+    - title: 📝 애플리케이션 정보
+      required:
+        - name
+        - description
+        - owner
+      properties:
+        name:
+          title: 프로젝트 이름
+          type: string
+          description: 저장소 이름으로 사용됩니다. (소문자, 하이픈만 사용)
+          pattern: '^[a-z0-9-]+$'
+          ui:
+            autofocus: true
+            help: '예: my-awesome-app, user-management-system'
+        description:
+          title: 설명
+          type: string
+          description: 이 애플리케이션에 대한 간단한 설명
+          ui:
+            widget: textarea
+            options:
+              rows: 3
+        owner:
+          title: 소유자
+          type: string
+          description: 이 애플리케이션을 소유할 팀
+          enum:
+            - ai-solution-dev-1
+            - ai-solution-dev-2
+            - service-dev-1
+            - service-dev-2
+            - daepa-dev
+            - lab
+
+    - title: 📂 저장소 설정
+      required:
+        - project
+      properties:
+        project:
+          title: 프로젝트 선택
+          type: string
+          description: Bitbucket 프로젝트를 선택하세요
+          enum:
+            - DEVOPS
+            - REC
+            - ECO
+
+    - title: ☁️ AWS 배포 설정
+      required:
+        - awsRegion
+        - instanceType
+        - databaseInstanceType
+      properties:
+        awsRegion:
+          title: AWS 리전
+          type: string
+          description: 애플리케이션을 배포할 AWS 리전
+          default: 'ap-northeast-2'
+          enum:
+            - 'ap-northeast-2'
+            - 'ap-northeast-1'
+            - 'ap-southeast-1'
+            - 'us-east-1'
+            - 'us-west-2'
+          enumNames:
+            - '서울 (ap-northeast-2)'
+            - '도쿄 (ap-northeast-1)'
+            - '싱가포르 (ap-southeast-1)'
+            - '버지니아 북부 (us-east-1)'
+            - '오레곤 (us-west-2)'
+        instanceType:
+          title: EC2 인스턴스 타입
+          type: string
+          description: 사용할 EC2 인스턴스 타입
+          default: 't3.medium'
+          enum:
+            - 't3.micro'
+            - 't3.small'
+            - 't3.medium'
+            - 't3.large'
+          enumNames:
+            - 't3.micro (1 vCPU, 1GB RAM) - 테스트용'
+            - 't3.small (2 vCPU, 2GB RAM) - 개발용'
+            - 't3.medium (2 vCPU, 4GB RAM) - 운영용 (권장)'
+            - 't3.large (2 vCPU, 8GB RAM) - 고성능'
+
+        databaseInstanceType:
+          title: RDS 인스턴스 타입
+          type: string
+          description: 사용할 RDS 인스턴스 타입
+          default: 'db.t3.small'
+          enum:
+            - 'db.t3.micro'
+            - 'db.t3.small'
+            - 'db.t3.medium'
+            - 'db.t3.large'
+          enumNames:
+            - 'db.t3.micro (1 vCPU, 1GB RAM) - 테스트용'
+            - 'db.t3.small (2 vCPU, 2GB RAM) - 개발용'
+            - 'db.t3.medium (2 vCPU, 4GB RAM) - 운영용 (권장)'
+            - 'db.t3.large (2 vCPU, 8GB RAM) - 고성능'
+
+  steps:
+    - id: fetch
+      name: 📥 템플릿 파일 가져오기
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          awsRegion: ${{ parameters.awsRegion }}
+          instanceType: ${{ parameters.instanceType }}
+          databaseInstanceType: ${{ parameters.databaseInstanceType }}
+
+    - id: publish
+      name: 📤 Bitbucket에 저장소 생성
+      action: publish:bitbucketCloud
+      input:
+        repoUrl: 'bitbucket.org?workspace=coinplugin&project=${{ parameters.project }}&repo=${{ parameters.name }}'
+        description: ${{ parameters.description }}
+        defaultBranch: main
+        gitCommitMessage: |
+          🎉 Initial commit: ${{ parameters.name }} fullstack application
+
+          Created via Backstage template with:
+          - ⚛️ Next.js frontend
+          - 🐍 Python FastAPI backend  
+          - 🐘 PostgreSQL database
+          - ☁️ AWS infrastructure with Terraform
+          - 🚀 Bitbucket Pipeline CI/CD
+
+          Ready for development and deployment!
+
+    - id: register
+      name: 📋 Backstage 카탈로그에 등록
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    links:
+      - title: 🔗 저장소 보기
+        url: ${{ steps.publish.output.remoteUrl }}
+        icon: bitbucket
+      - title: 📋 Backstage에서 열기
+        url: ${{ steps.register.output.catalogEntityRef }}
+        icon: catalog
+      - title: 🚀 Pipeline 상태 확인
+        url: ${{ steps.publish.output.remoteUrl }}/pipelines
+        icon: build
+    text:
+      - title: 🎉 생성 완료!
+        content: |
+          풀스택 애플리케이션이 성공적으로 생성되었습니다!
+
+          **다음 단계:**
+          1. 📋 Backstage 카탈로그에서 애플리케이션 상태 확인
+          2. 🚀 Bitbucket Pipeline에서 자동 배포 진행 상황 모니터링
+          3. ☁️ AWS 콘솔에서 인프라 리소스 확인
+          4. 🌐 배포 완료 후 애플리케이션 URL 접속
+
+          **포함된 기능:**
+          ✅ Next.js 프론트엔드
+          ✅ Python FastAPI 백엔드
+          ✅ PostgreSQL 데이터베이스
+          ✅ Docker 컨테이너화
+          ✅ AWS 인프라 (Terraform)
+          ✅ CI/CD 파이프라인
+          ✅ 모니터링 및 로깅

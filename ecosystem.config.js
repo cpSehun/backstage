@@ -13,6 +13,9 @@ module.exports = {
 
       // 스크립트 인터프리터 (yarn은 셸 스크립트이므로 'none'으로 설정)
       interpreter: 'none',
+      kill_timeout: 5000, // 5초 후 강제 종료
+      force: true, // 강제 종료 활성화
+      treekill: true, // 자식 프로세스도 함께 종료
 
       // 개발 환경에서 유용: 파일 변경 시 자동으로 앱 재시작
       watch: true,

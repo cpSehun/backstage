@@ -1,0 +1,132 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.name }}
+  description: ${{ values.description }}
+  annotations:
+    # Bitbucket 연동
+    bitbucket.org/project-slug: ${{ values.name }}
+    bitbucket.org/repo-slug: ${{ values.name }}
+    
+    # AWS 리소스 연동
+    aws.amazon.com/aws-region: ${{ values.awsRegion }}
+    aws.amazon.com/aws-account-id: 'your-account-id'  # 실제 계정 ID로 변경 필요
+    
+    # Terraform 상태
+    terraform.io/workspace: ${{ values.name }}
+    
+    # 모니터링
+    grafana/dashboard-selector: 'app=${{ values.name }}'
+    
+  tags:
+    - fullstack
+    - nextjs
+    - python
+    - postgresql
+    - aws
+    - terraform
+  links:
+    - url: https://docs.cplabs.com/apps/${{ values.name }}
+      title: Documentation
+      icon: docs
+    - url: https://github.com/coinplugin/${{ values.name }}
+      title: Source Code
+      icon: github
+      
+spec:
+  type: service
+  lifecycle: experimental
+  owner: ${{ values.owner }}
+  system: platform
+  providesApis:
+    - ${{ values.name }}-api
+  dependsOn:
+    - resource:${{ values.name }}-database
+    - resource:${{ values.name }}-infrastructure
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: ${{ values.name }}-api
+  description: ${{ values.name }} REST API
+  annotations:
+    aws.amazon.com/aws-region: ${{ values.awsRegion }}
+spec:
+  type: openapi
+  lifecycle: experimental
+  owner: ${{ values.owner }}
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: ${{ values.name | capitalize }} API
+      version: 1.0.0
+      description: ${{ values.description }}
+    paths:
+      /health:
+        get:
+          summary: Health check endpoint
+          responses:
+            '200':
+              description: Service is healthy
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: healthy
+                      timestamp:
+                        type: string
+                        format: date-time
+                      database:
+                        type: string
+                        example: connected
+      /api/status:
+        get:
+          summary: Service status
+          responses:
+            '200':
+              description: Service status information
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      service:
+                        type: string
+                      status:
+                        type: string
+                      version:
+                        type: string
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: ${{ values.name }}-database
+  description: PostgreSQL database for ${{ values.name }}
+  annotations:
+    aws.amazon.com/aws-region: ${{ values.awsRegion }}
+    aws.amazon.com/service-type: rds
+spec:
+  type: database
+  lifecycle: experimental
+  owner: ${{ values.owner }}
+  dependsOn:
+    - resource:${{ values.name }}-infrastructure
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: ${{ values.name }}-infrastructure
+  description: AWS infrastructure for ${{ values.name }}
+  annotations:
+    aws.amazon.com/aws-region: ${{ values.awsRegion }}
+    terraform.io/workspace: ${{ values.name }}
+spec:
+  type: infrastructure
+  lifecycle: experimental
+  owner: ${{ values.owner }}
