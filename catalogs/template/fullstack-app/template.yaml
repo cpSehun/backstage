@@ -142,9 +142,9 @@ spec:
       name: 📤 Bitbucket에 저장소 생성
       action: publish:bitbucketCloud
       input:
-        repoUrl: 'bitbucket.org?workspace=coinplugin&project=${{ parameters.project }}&repo=${{ parameters.name }}'
+        repoUrl: bitbucket.org?workspace=coinplugin&project=${{ parameters.project }}&repo=${{ parameters.name }}
         description: ${{ parameters.description }}
-        defaultBranch: main
+        defaultBranch: 'main'
         gitCommitMessage: |
           🎉 Initial commit: ${{ parameters.name }} fullstack application
 
