@@ -402,3 +402,12 @@ spec:
   lifecycle: production
   owner: ai-solution-dev-2 # AI Solution Dev 2 → ai-solution-dev-2
   system: infrastructure
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: platform
+  description: Platform services and applications
+spec:
+  owner: ai-solution-dev-2

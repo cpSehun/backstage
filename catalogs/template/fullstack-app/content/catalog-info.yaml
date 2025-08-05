@@ -7,17 +7,17 @@ metadata:
     # Bitbucket 연동
     bitbucket.org/project-slug: ${{ values.name }}
     bitbucket.org/repo-slug: ${{ values.name }}
-    
+
     # AWS 리소스 연동
     aws.amazon.com/aws-region: ${{ values.awsRegion }}
-    aws.amazon.com/aws-account-id: 'your-account-id'  # 실제 계정 ID로 변경 필요
-    
+    aws.amazon.com/aws-account-id: 'your-account-id' # 실제 계정 ID로 변경 필요
+
     # Terraform 상태
     terraform.io/workspace: ${{ values.name }}
-    
+
     # 모니터링
     grafana/dashboard-selector: 'app=${{ values.name }}'
-    
+
   tags:
     - fullstack
     - nextjs
@@ -29,10 +29,10 @@ metadata:
     - url: https://docs.cplabs.com/apps/${{ values.name }}
       title: Documentation
       icon: docs
-    - url: https://github.com/coinplugin/${{ values.name }}
+    - url: https://bitbucket.org/coinplugin/${{ values.name }}
       title: Source Code
       icon: github
-      
+
 spec:
   type: service
   lifecycle: experimental
