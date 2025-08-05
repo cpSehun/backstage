@@ -20,20 +20,23 @@ pipelines:
           - node
           - pip
         script:
-          - echo "Building and testing ${{ values.name }} application..."
-          - echo "Frontend build test"
+          - echo "Building and testing web-test application..."
+
+          # Frontend build test
           - echo "Testing Frontend build..."
           - cd frontend
           - npm ci
           - npm run build
           - cd ..
-          - echo "Backend build test"
+
+          # Backend build test
           - echo "Testing Backend build..."
           - cd backend
           - pip install -r requirements.txt
           - python -m pytest --version || echo "No tests found, continuing..."
           - cd ..
-          - echo "Docker build test"
+
+          # Docker build test
           - echo "Testing Docker builds..."
           - docker build -t test-frontend ./frontend
           - docker build -t test-backend ./backend
@@ -47,31 +50,37 @@ pipelines:
           caches:
             - terraform
           script:
-            - echo "Planning AWS infrastructure for ${{ values.name }}..."
-            - echo "Installing Terraform..."
+            - echo "Planning AWS infrastructure for web-test..."
+
+            # Install Terraform
             - apt-get update && apt-get install -y curl unzip
             - curl -fsSL https://releases.hashicorp.com/terraform/1.7.0/terraform_1.7.0_linux_amd64.zip -o terraform.zip
             - unzip terraform.zip && mv terraform /usr/local/bin/
             - terraform version
-            - echo "Installing AWS CLI..."
+
+            # Install AWS CLI
             - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             - unzip awscliv2.zip && ./aws/install
-            - echo "Copying terraform files and initializing..."
+
+            # Copy terraform files and initialize
             - cp -r terraform/* ./
             - terraform init
-            - echo "Creating terraform.tfvars..."
+
+            # Create terraform.tfvars
             - |
               cat > terraform.tfvars << EOF
-              project_name = "${{ values.name }}"
-              aws_region = "${{ values.awsRegion }}"
-              instance_type = "${{ values.instanceType }}"
+              project_name = "web-test"
+              aws_region = "ap-northeast-2"
+              instance_type = "t3.medium"
               key_name = "$AWS_KEY_NAME"
               db_password = "$DB_PASSWORD"
               EOF
-            - echo "Planning infrastructure..."
+
+            # Plan infrastructure
             - terraform plan -var-file="terraform.tfvars" -out=tfplan
             - terraform show -no-color tfplan > tfplan.txt
-            - echo "Saving plan..."
+
+            # Save plan
             - tar -czf terraform-plan.tar.gz tfplan .terraform/ terraform.tfvars
           artifacts:
             - terraform-plan.tar.gz
@@ -83,18 +92,22 @@ pipelines:
           caches:
             - terraform
           script:
-            - echo "Deploying AWS infrastructure for ${{ values.name }}..."
-            - echo "Installing tools..."
+            - echo "Deploying AWS infrastructure for web-test..."
+
+            # Install tools
             - apt-get update && apt-get install -y curl unzip
             - curl -fsSL https://releases.hashicorp.com/terraform/1.7.0/terraform_1.7.0_linux_amd64.zip -o terraform.zip
             - unzip terraform.zip && mv terraform /usr/local/bin/
             - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             - unzip awscliv2.zip && ./aws/install
-            - echo "Restoring terraform plan..."
+
+            # Restore terraform plan
             - tar -xzf terraform-plan.tar.gz
-            - echo "Applying infrastructure..."
+
+            # Apply infrastructure
             - terraform apply -auto-approve tfplan
-            - echo "Getting outputs..."
+
+            # Get outputs
             - terraform output -json > terraform-outputs.json
             - echo "Infrastructure deployed successfully!"
             - terraform output
@@ -106,15 +119,17 @@ pipelines:
           services:
             - docker
           script:
-            - echo "Building application images for ${{ values.name }}..."
-            - echo "Building images with tags..."
-            - docker build -t ${{ values.name }}-frontend:${BITBUCKET_COMMIT::8} ./frontend
-            - docker build -t ${{ values.name }}-backend:${BITBUCKET_COMMIT::8} ./backend
-            - docker tag ${{ values.name }}-frontend:${BITBUCKET_COMMIT::8} ${{ values.name }}-frontend:latest
-            - docker tag ${{ values.name }}-backend:${BITBUCKET_COMMIT::8} ${{ values.name }}-backend:latest
-            - echo "Saving images as tar files for deployment..."
-            - docker save ${{ values.name }}-frontend:latest > frontend-image.tar
-            - docker save ${{ values.name }}-backend:latest > backend-image.tar
+            - echo "Building application images for web-test..."
+
+            # Build images with tags
+            - docker build -t web-test-frontend:${BITBUCKET_COMMIT::8} ./frontend
+            - docker build -t web-test-backend:${BITBUCKET_COMMIT::8} ./backend
+            - docker tag web-test-frontend:${BITBUCKET_COMMIT::8} web-test-frontend:latest
+            - docker tag web-test-backend:${BITBUCKET_COMMIT::8} web-test-backend:latest
+
+            # Save images as tar files for deployment
+            - docker save web-test-frontend:latest > frontend-image.tar
+            - docker save web-test-backend:latest > backend-image.tar
 
             - echo "Images built and saved successfully!"
           artifacts:
@@ -124,16 +139,18 @@ pipelines:
       - step:
           name: 🚁 Deploy Application
           script:
-            - echo "Deploying ${{ values.name }} to AWS EC2..."
-            - echo "Installing AWS CLI..."
+            - echo "Deploying web-test to AWS EC2..."
+
+            # Install AWS CLI
             - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             - unzip awscliv2.zip && ./aws/install
-            - echo "Finding EC2 instance..."
+
+            # Find EC2 instance
             - |
               INSTANCE_ID=$(aws ec2 describe-instances \
-                --filters "Name=tag:Name,Values=${{ values.name }}-instance" "Name=instance-state-name,Values=running" \
+                --filters "Name=tag:Name,Values=web-test-instance" "Name=instance-state-name,Values=running" \
                 --query "Reservations[0].Instances[0].InstanceId" \
-                --output text --region ${{ values.awsRegion }})
+                --output text --region ap-northeast-2)
 
               if [ "$INSTANCE_ID" = "None" ] || [ "$INSTANCE_ID" = "null" ]; then
                 echo "❌ No running EC2 instance found. Please ensure infrastructure is deployed."
@@ -141,7 +158,8 @@ pipelines:
               fi
 
               echo "Found EC2 instance: $INSTANCE_ID"
-            - echo "Creating deployment package..."
+
+            # Create deployment package
             - |
               cat > deploy-app.sh << 'EOF'
               #!/bin/bash
@@ -182,13 +200,14 @@ pipelines:
               EOF
 
               chmod +x deploy-app.sh
-            - echo "Creating production docker-compose..."
+
+            # Create production docker-compose
             - |
               cat > docker-compose.prod.yml << 'EOF'
               version: '3.8'
               services:
                 frontend:
-                  image: ${{ values.name }}-frontend:latest
+                  image: web-test-frontend:latest
                   ports:
                     - "3000:3000"
                   environment:
@@ -199,7 +218,7 @@ pipelines:
                     - backend
 
                 backend:
-                  image: ${{ values.name }}-backend:latest
+                  image: web-test-backend:latest
                   ports:
                     - "8000:8000"
                   env_file:
@@ -211,7 +230,8 @@ pipelines:
                     timeout: 10s
                     retries: 3
               EOF
-            - echo "Getting RDS endpoint from terraform outputs..."
+
+            # Get RDS endpoint from terraform outputs
             - |
               if [ -f "terraform-outputs.json" ]; then
                 RDS_ENDPOINT=$(cat terraform-outputs.json | grep -o '"rds_endpoint":{"value":"[^"]*"' | cut -d'"' -f4)
@@ -220,9 +240,11 @@ pipelines:
                 echo "Warning: No terraform outputs found, using default RDS endpoint"
                 RDS_ENDPOINT="localhost"
               fi
-            - echo "Note: In a real scenario, you would use AWS Systems Manager Session Manager or another secure method to deploy to EC2. This is a simplified example."
-            - echo "Deployment package prepared for EC2 instance: $INSTANCE_ID"
-            - echo "Files ready: deploy-app.sh, docker-compose.prod.yml, frontend-image.tar, backend-image.tar"
+
+            # Note: In a real scenario, you would use AWS Systems Manager Session Manager
+            # or another secure method to deploy to EC2. This is a simplified example.
+            - "echo Deployment package prepared for EC2 instance: $INSTANCE_ID"
+            - "echo Files ready: deploy-app.sh, docker-compose.prod.yml, frontend-image.tar, backend-image.tar"
             - echo "🎉 Deployment completed! Check your EC2 instance and Load Balancer URL."
 
   pull-requests:
@@ -235,22 +257,27 @@ pipelines:
             - node
             - pip
           script:
-            - echo "Testing Pull Request for ${{ values.name }}..."
-            - echo "Running frontend tests..."
+            - echo "Testing Pull Request for web-test..."
+
+            # Frontend tests
             - cd frontend && npm ci && npm run build && cd ..
-            - echo "Running backend tests..."
+
+            # Backend tests
             - cd backend && pip install -r requirements.txt && cd ..
-            - echo "Running Docker build tests..."
+
+            # Docker build tests
             - docker build -t test-frontend ./frontend
             - docker build -t test-backend ./backend
-            - echo "Running integration test with docker-compose..."
+
+            # Integration test with docker-compose
             - docker-compose up -d postgres
             - sleep 20
             - docker-compose up -d backend
             - sleep 30
             - docker-compose up -d frontend
             - sleep 10
-            - echo "Running simple health check..."
+
+            # Simple health check
             - timeout 60 bash -c 'until curl -f http://localhost:8000/health; do sleep 2; done' || echo "Backend not ready, continuing..."
 
             - echo "✅ PR tests completed!"
