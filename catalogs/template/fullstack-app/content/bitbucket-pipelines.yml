@@ -157,7 +157,7 @@ pipelines:
                 exit 1
               fi
 
-              echo "Found EC2 instance: $INSTANCE_ID"
+              "echo Found EC2 instance: $INSTANCE_ID"
 
             # Create deployment package
             - |
@@ -243,8 +243,8 @@ pipelines:
 
             # Note: In a real scenario, you would use AWS Systems Manager Session Manager
             # or another secure method to deploy to EC2. This is a simplified example.
-            - "echo Deployment package prepared for EC2 instance: $INSTANCE_ID"
-            - "echo Files ready: deploy-app.sh, docker-compose.prod.yml, frontend-image.tar, backend-image.tar"
+            - 'echo Deployment package prepared for EC2 instance: $INSTANCE_ID'
+            - 'echo Files ready: deploy-app.sh, docker-compose.prod.yml, frontend-image.tar, backend-image.tar'
             - echo "🎉 Deployment completed! Check your EC2 instance and Load Balancer URL."
 
   pull-requests:
