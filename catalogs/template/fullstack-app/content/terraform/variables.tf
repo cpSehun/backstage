@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS region"
   type        = string
-  default     = "${{ values.awsRegion }}"  # 템플릿에서 직접 설정
+  default     = "${{ parameters.awsRegion }}"  # 템플릿에서 직접 설정
 }
 
 variable "project_name" {
@@ -19,7 +19,7 @@ variable "vpc_cidr" {
 variable "instance_type" {
   description = "EC2 instance type"
   type        = string
-  default     = "${{ values.instanceType }}"  # 템플릿에서 직접 설정
+  default     = "${{ parameters.instanceType }}"  # 템플릿에서 직접 설정
 }
 
 variable "key_name" {
@@ -31,7 +31,7 @@ variable "key_name" {
 variable "db_instance_class" {
   description = "RDS instance class"
   type        = string
-  default     = "${{ values.databaseInstanceType }}"  # 템플릿에서 직접 설정
+  default     = "${{ parameters.databaseInstanceType }}"  # 템플릿에서 직접 설정
 }
 variable "db_name" {
   description = "Database name"

@@ -201,16 +201,16 @@ spec:
   output:
     links:
       - title: 🔗 저장소 보기
-        url: ${{ steps.publish.output.remoteUrl }}
+        url: https://bitbucket.org/coinplugin/${{ parameters.name }}
         icon: bitbucket
       - title: 📋 Backstage에서 열기
-        url: ${{ steps.register.output.catalogEntityRef }}
+        url: /catalog/default/component/${{ parameters.name }}
         icon: catalog
-      - title: 🚀 Pipeline 상태 확인
-        url: ${{ steps.publish.output.remoteUrl }}/pipelines
-        icon: build
-      - title: ☁️ AWS 콘솔
-        url: https://console.aws.amazon.com/ec2/home?region=${{ parameters.awsRegion }}
+      # - title: 🚀 Pipeline 상태 확인
+      #   url: https://bitbucket.org/coinplugin/${{ parameters.name }}/pipelines
+      #   icon: build
+      # - title: ☁️ AWS 콘솔
+      #   url: https://console.aws.amazon.com/ec2/home?region=${{ parameters.awsRegion }}
     text:
       - title: 📋 다음 단계를 수행하세요 (5분)
         content: |
@@ -218,7 +218,16 @@ spec:
 
           ## 🔧 배포를 위한 필수 설정:
 
-          ### 1️⃣ 환경 변수 설정 (3분)
+          ### 1️⃣ Pipeline 활성화 및 실행 (2분)
+          ```
+          📍 경로: 저장소 → Pipelines 메뉴
+
+          ✅ "Enable Pipelines" 버튼 클릭
+          ✅ 자동으로 첫 번째 배포 시작! (15분 소요)
+          ```
+
+
+          ### 2️⃣ 환경 변수 설정 (3분)
           ```
           📍 경로: 저장소 → Settings → Pipelines → Repository variables
 
@@ -226,14 +235,6 @@ spec:
           ├── AWS_ACCESS_KEY_ID = your-aws-access-key (✅ Secured)
           ├── AWS_SECRET_ACCESS_KEY = your-aws-secret-key (✅ Secured)
           └── AWS_KEY_NAME = ${{ parameters.keyName }} (⬜ Secured 안함)
-          ```
-
-          ### 2️⃣ Pipeline 활성화 및 실행 (2분)
-          ```
-          📍 경로: 저장소 → Pipelines 메뉴
-
-          ✅ "Enable Pipelines" 버튼 클릭
-          ✅ 자동으로 첫 번째 배포 시작! (15분 소요)
           ```
 
           ### 3️⃣ 결과 확인 (배포 완료 후)
