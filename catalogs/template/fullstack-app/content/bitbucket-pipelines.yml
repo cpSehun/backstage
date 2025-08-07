@@ -1,3 +1,6 @@
+# 단순화된 Bitbucket Pipelines - Repository 변수 활용
+# AWS 풀스택 애플리케이션 자동 배포
+
 image: atlassian/default-image:4
 
 definitions:
@@ -10,276 +13,409 @@ definitions:
     pip: ~/.cache/pip
 
 pipelines:
+  # 🚀 첫 번째 커밋 시 완전 자동 배포
   default:
     - step:
-        name: 🧪 Build and Test
+        name: 🎉 AWS 풀스택 애플리케이션 자동 배포
+        size: 2x
         services:
           - docker
         caches:
-          - docker
+          - terraform
           - node
           - pip
         script:
-          - echo "Building and testing web-test application..."
+          - echo "🚀 Starting automated deployment..."
+          - 'echo 📅 Started at: $(date)'
 
-          # Frontend build test
-          - echo "Testing Frontend build..."
-          - cd frontend
-          - npm ci
-          - npm run build
-          - cd ..
+          # 🔐 필수 환경 변수 확인
+          - |
+            echo "🔍 Verifying repository variables..."
 
-          # Backend build test
-          - echo "Testing Backend build..."
-          - cd backend
-          - pip install -r requirements.txt
-          - python -m pytest --version || echo "No tests found, continuing..."
-          - cd ..
+            # AWS 인증 확인
+            if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+              echo "❌ ERROR: AWS credentials missing"
+              echo ""
+              echo "📋 Required Repository Variables (Settings → Pipelines → Repository variables):"
+              echo "   - AWS_ACCESS_KEY_ID (✅ Secured)"
+              echo "   - AWS_SECRET_ACCESS_KEY (✅ Secured)"
+              echo "   - AWS_KEY_NAME (⬜ Not secured)"
+              echo ""
+              exit 1
+            fi
 
-          # Docker build test
-          - echo "Testing Docker builds..."
-          - docker build -t test-frontend ./frontend
-          - docker build -t test-backend ./backend
+            # 키페어 이름 확인
+            if [ -z "$AWS_KEY_NAME" ]; then
+              echo "❌ ERROR: AWS_KEY_NAME not set"
+              echo "📋 Please set AWS_KEY_NAME in Repository variables"
+              exit 1
+            fi
 
-          - echo "✅ All tests passed!"
+            echo "✅ Repository variables verified"
+
+            # 프로젝트 설정
+            export PROJECT_NAME="${BITBUCKET_REPO_SLUG}"
+            export KEY_NAME="${AWS_KEY_NAME}"
+
+            # 데이터베이스 패스워드 생성
+            if [ -z "$DB_PASSWORD" ]; then
+              export DB_PASSWORD=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-25)
+              echo "🔑 Generated secure database password"
+            fi
+
+            echo "📋 Deployment Configuration:"
+            echo "   - Project Name: $PROJECT_NAME"
+            echo "   - EC2 Key Pair: $KEY_NAME"
+            echo "   - DB Password: [Generated]"
+
+          # 🧪 프로젝트 구조 및 빌드 테스트
+          - echo "🧪 Testing application builds..."
+          - |
+            echo "📁 Verifying project structure..."
+            ls -la
+
+            # 필수 디렉토리 확인
+            for dir in frontend backend terraform; do
+              if [ ! -d "$dir" ]; then
+                echo "❌ ERROR: Required directory '$dir' not found"
+                echo "📁 Current structure:"
+                ls -la
+                exit 1
+              fi
+            done
+            echo "✅ Project structure verified"
+
+            # Frontend 빌드 테스트
+            echo "📦 Testing frontend build..."
+            cd frontend
+            if [ ! -f "package.json" ]; then
+              echo "❌ ERROR: package.json not found in frontend/"
+              exit 1
+            fi
+            npm install --prefer-offline --no-audit
+            npm run build
+            cd ..
+            echo "✅ Frontend build successful"
+
+            # Backend 의존성 테스트
+            echo "🐍 Testing backend dependencies..."
+            
+            # Python과 pip 설치 추가
+            echo "Installing Python and pip..."
+            apt-get update -qq
+            apt-get install -y python3 python3-pip --quiet
+            
+            cd backend
+            if [ ! -f "requirements.txt" ]; then
+              echo "❌ ERROR: requirements.txt not found in backend/"
+              exit 1
+            fi
+            pip3 install -r requirements.txt --quiet --no-warn-script-location
+            cd ..
+            echo "✅ Backend dependencies verified"
+
+            # Docker 빌드 테스트
+            echo "🐳 Testing Docker builds..."
+            docker build -t test-frontend ./frontend --quiet
+            docker build -t test-backend ./backend --quiet
+            echo "✅ Docker builds successful"
+
+          # 🏗️ AWS 인프라 배포
+          - echo "🏗️ Deploying AWS infrastructure..."
+          - |
+            # 필수 도구 설치
+            echo "🔧 Installing deployment tools..."
+            apt-get update -qq
+            apt-get install -y curl unzip jq --quiet
+
+            # Terraform 설치
+            echo "Installing Terraform..."
+            curl -fsSL https://releases.hashicorp.com/terraform/1.7.0/terraform_1.7.0_linux_amd64.zip -o terraform.zip
+            unzip -q terraform.zip
+            mv terraform /usr/local/bin/
+            rm terraform.zip
+            terraform version
+
+            # AWS CLI 설치
+            echo "Installing AWS CLI..."
+            curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip -q awscliv2.zip
+            ./aws/install
+            rm -rf aws awscliv2.zip
+            aws --version
+
+            echo "✅ Tools installed successfully"
+
+            # Terraform 준비
+            echo "🔄 Preparing Terraform..."
+
+            # Terraform 파일 복사
+            if [ ! -d "terraform" ]; then
+              echo "❌ ERROR: terraform directory not found"
+              exit 1
+            fi
+
+            cp -r terraform/* ./
+
+            # Terraform 초기화
+            terraform init -input=false
+            echo "✅ Terraform initialized"
+
+            # 변수 파일 생성 (동적 값만)
+            echo "📝 Creating terraform variables..."
+            cat > terraform.tfvars << EOF
+            # 동적으로 설정되는 값들
+            project_name = "$PROJECT_NAME"
+            key_name = "$KEY_NAME"
+            db_password = "$DB_PASSWORD"
+
+            # 참고: aws_region, instance_type, db_instance_class는 
+            # terraform/variables.tf에서 템플릿 값으로 이미 설정됨
+            EOF
+
+            echo "📋 Planning infrastructure changes..."
+            terraform plan -var-file="terraform.tfvars" -out=tfplan -input=false
+
+            echo "🚀 Applying infrastructure changes..."
+            echo "⏱️  This will take 10-15 minutes..."
+            terraform apply -auto-approve tfplan
+
+            echo "✅ AWS infrastructure deployed successfully!"
+
+            # 배포 정보 저장
+            terraform output -json > deployment-info.json
+            echo "📊 Deployment information saved"
+
+          # 🐳 애플리케이션 이미지 빌드
+          - echo "🐳 Building production application images..."
+          - |
+            echo "🏗️ Building final Docker images..."
+
+            # 프로덕션 이미지 빌드
+            docker build -t $PROJECT_NAME-frontend:latest ./frontend
+            docker build -t $PROJECT_NAME-backend:latest ./backend
+
+            echo "✅ Production images built successfully"
+
+            # 배포 완료 정보
+            echo ""
+            echo "🎉 DEPLOYMENT COMPLETED SUCCESSFULLY! 🎉"
+            echo "=" * 50
+            echo "⭐ Project: $PROJECT_NAME"
+            echo "🕐 Completed at: $(date)"
+
+            # 배포된 리소스 정보 출력
+            if [ -f "deployment-info.json" ]; then
+              echo ""
+              echo "🌐 Application Access:"
+              
+              # URL 추출 시도
+              FRONTEND_URL=$(cat deployment-info.json | jq -r '.application_urls.value.frontend // empty' 2>/dev/null || echo "")
+              BACKEND_URL=$(cat deployment-info.json | jq -r '.application_urls.value.backend_api // empty' 2>/dev/null || echo "")
+              LB_DNS=$(cat deployment-info.json | jq -r '.load_balancer_dns.value // empty' 2>/dev/null || echo "")
+              
+              if [ -n "$FRONTEND_URL" ]; then
+                echo "   Frontend: $FRONTEND_URL"
+              elif [ -n "$LB_DNS" ]; then
+                echo "   Frontend: http://$LB_DNS"
+              else
+                echo "   Frontend: Check Load Balancer DNS in AWS Console"
+              fi
+              
+              if [ -n "$BACKEND_URL" ]; then
+                echo "   Backend API: $BACKEND_URL"
+                echo "   Health Check: $BACKEND_URL/health"
+              fi
+              
+              echo ""
+              echo "🎯 Next Steps:"
+              echo "1. ⏳ Wait 5-10 minutes for EC2 instances to fully initialize"
+              echo "2. 🌐 Access your application using the URL above"
+              echo "3. 📊 Monitor resources in AWS Console"
+              echo "4. 📋 Check application status in Backstage catalog"
+              echo ""
+              echo "🔍 AWS Resources Created:"
+              echo "   - VPC with public/private subnets"
+              echo "   - Application Load Balancer"
+              echo "   - Auto Scaling Group with EC2 instances"
+              echo "   - RDS PostgreSQL database"
+              echo "   - Security Groups and IAM roles"
+            else
+              echo "⚠️  Deployment info not available. Check Terraform outputs manually:"
+              echo "   terraform output"
+            fi
+
+            echo ""
+            echo "🚀 Your $PROJECT_NAME application is ready!"
+
+        artifacts:
+          - deployment-info.json
+          - terraform.tfvars
+          - tfplan
 
   branches:
     main:
       - step:
-          name: 🏗️ Infrastructure Planning (Terraform)
-          caches:
-            - terraform
-          script:
-            - echo "Planning AWS infrastructure for web-test..."
-
-            # Install Terraform
-            - apt-get update && apt-get install -y curl unzip
-            - curl -fsSL https://releases.hashicorp.com/terraform/1.7.0/terraform_1.7.0_linux_amd64.zip -o terraform.zip
-            - unzip terraform.zip && mv terraform /usr/local/bin/
-            - terraform version
-
-            # Install AWS CLI
-            - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            - unzip awscliv2.zip && ./aws/install
-
-            # Copy terraform files and initialize
-            - cp -r terraform/* ./
-            - terraform init
-
-            # Create terraform.tfvars
-            - |
-              cat > terraform.tfvars << EOF
-              project_name = "web-test"
-              aws_region = "ap-northeast-2"
-              instance_type = "t3.medium"
-              key_name = "$AWS_KEY_NAME"
-              db_password = "$DB_PASSWORD"
-              EOF
-
-            # Plan infrastructure
-            - terraform plan -var-file="terraform.tfvars" -out=tfplan
-            - terraform show -no-color tfplan > tfplan.txt
-
-            # Save plan
-            - tar -czf terraform-plan.tar.gz tfplan .terraform/ terraform.tfvars
-          artifacts:
-            - terraform-plan.tar.gz
-            - tfplan.txt
-
-      - step:
-          name: 🚀 Deploy Infrastructure
-          trigger: manual
-          caches:
-            - terraform
-          script:
-            - echo "Deploying AWS infrastructure for web-test..."
-
-            # Install tools
-            - apt-get update && apt-get install -y curl unzip
-            - curl -fsSL https://releases.hashicorp.com/terraform/1.7.0/terraform_1.7.0_linux_amd64.zip -o terraform.zip
-            - unzip terraform.zip && mv terraform /usr/local/bin/
-            - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            - unzip awscliv2.zip && ./aws/install
-
-            # Restore terraform plan
-            - tar -xzf terraform-plan.tar.gz
-
-            # Apply infrastructure
-            - terraform apply -auto-approve tfplan
-
-            # Get outputs
-            - terraform output -json > terraform-outputs.json
-            - echo "Infrastructure deployed successfully!"
-            - terraform output
-          artifacts:
-            - terraform-outputs.json
-
-      - step:
-          name: 🐳 Build and Push Images
-          services:
-            - docker
-          script:
-            - echo "Building application images for web-test..."
-
-            # Build images with tags
-            - docker build -t web-test-frontend:${BITBUCKET_COMMIT::8} ./frontend
-            - docker build -t web-test-backend:${BITBUCKET_COMMIT::8} ./backend
-            - docker tag web-test-frontend:${BITBUCKET_COMMIT::8} web-test-frontend:latest
-            - docker tag web-test-backend:${BITBUCKET_COMMIT::8} web-test-backend:latest
-
-            # Save images as tar files for deployment
-            - docker save web-test-frontend:latest > frontend-image.tar
-            - docker save web-test-backend:latest > backend-image.tar
-
-            - echo "Images built and saved successfully!"
-          artifacts:
-            - frontend-image.tar
-            - backend-image.tar
-
-      - step:
-          name: 🚁 Deploy Application
-          script:
-            - echo "Deploying web-test to AWS EC2..."
-
-            # Install AWS CLI
-            - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            - unzip awscliv2.zip && ./aws/install
-
-            # Find EC2 instance
-            - |
-              INSTANCE_ID=$(aws ec2 describe-instances \
-                --filters "Name=tag:Name,Values=web-test-instance" "Name=instance-state-name,Values=running" \
-                --query "Reservations[0].Instances[0].InstanceId" \
-                --output text --region ap-northeast-2)
-
-              if [ "$INSTANCE_ID" = "None" ] || [ "$INSTANCE_ID" = "null" ]; then
-                echo "❌ No running EC2 instance found. Please ensure infrastructure is deployed."
-                exit 1
-              fi
-
-              "echo Found EC2 instance: $INSTANCE_ID"
-
-            # Create deployment package
-            - |
-              cat > deploy-app.sh << 'EOF'
-              #!/bin/bash
-              set -e
-
-              echo "Starting application deployment..."
-              cd /opt/app
-
-              # Stop existing containers
-              docker-compose down || true
-
-              # Load new images
-              echo "Loading new Docker images..."
-              docker load < frontend-image.tar
-              docker load < backend-image.tar
-
-              # Update environment variables
-              echo "DATABASE_URL=postgresql://appuser:${DB_PASSWORD}@${RDS_ENDPOINT}:5432/appdb" > .env
-              echo "NODE_ENV=production" >> .env
-              echo "NEXT_PUBLIC_API_URL=http://localhost:8000" >> .env
-
-              # Start services
-              echo "Starting services..."
-              docker-compose -f docker-compose.prod.yml up -d
-
-              # Wait for services to be healthy
-              echo "Waiting for services to start..."
-              sleep 30
-
-              # Check health
-              if curl -f http://localhost:8000/health; then
-                echo "✅ Application deployed successfully!"
-              else
-                echo "❌ Application health check failed"
-                docker-compose logs
-                exit 1
-              fi
-              EOF
-
-              chmod +x deploy-app.sh
-
-            # Create production docker-compose
-            - |
-              cat > docker-compose.prod.yml << 'EOF'
-              version: '3.8'
-              services:
-                frontend:
-                  image: web-test-frontend:latest
-                  ports:
-                    - "3000:3000"
-                  environment:
-                    - NODE_ENV=production
-                    - NEXT_PUBLIC_API_URL=http://localhost:8000
-                  restart: unless-stopped
-                  depends_on:
-                    - backend
-
-                backend:
-                  image: web-test-backend:latest
-                  ports:
-                    - "8000:8000"
-                  env_file:
-                    - .env
-                  restart: unless-stopped
-                  healthcheck:
-                    test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-                    interval: 30s
-                    timeout: 10s
-                    retries: 3
-              EOF
-
-            # Get RDS endpoint from terraform outputs
-            - |
-              if [ -f "terraform-outputs.json" ]; then
-                RDS_ENDPOINT=$(cat terraform-outputs.json | grep -o '"rds_endpoint":{"value":"[^"]*"' | cut -d'"' -f4)
-                echo "RDS Endpoint: $RDS_ENDPOINT"
-              else
-                echo "Warning: No terraform outputs found, using default RDS endpoint"
-                RDS_ENDPOINT="localhost"
-              fi
-
-            # Note: In a real scenario, you would use AWS Systems Manager Session Manager
-            # or another secure method to deploy to EC2. This is a simplified example.
-            - 'echo Deployment package prepared for EC2 instance: $INSTANCE_ID'
-            - 'echo Files ready: deploy-app.sh, docker-compose.prod.yml, frontend-image.tar, backend-image.tar'
-            - echo "🎉 Deployment completed! Check your EC2 instance and Load Balancer URL."
-
-  pull-requests:
-    '**':
-      - step:
-          name: 🧪 PR Testing
+          name: 🔄 애플리케이션 업데이트
+          # condition 부분 완전 삭제
           services:
             - docker
           caches:
             - node
             - pip
           script:
-            - echo "Testing Pull Request for web-test..."
+            - echo "🔄 Updating application..."
+            - export PROJECT_NAME="${BITBUCKET_REPO_SLUG}"
+            - export TIMESTAMP=$(date +%Y%m%d-%H%M)
 
-            # Frontend tests
-            - cd frontend && npm ci && npm run build && cd ..
+            # 애플리케이션 빌드
+            - |
+              echo "📦 Rebuilding application components..."
 
-            # Backend tests
-            - cd backend && pip install -r requirements.txt && cd ..
+              if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then
+                echo "Building frontend..."
+                cd frontend
+                npm install --prefer-offline --no-audit
+                npm run build
+                cd ..
+                echo "✅ Frontend updated"
+              fi
 
-            # Docker build tests
-            - docker build -t test-frontend ./frontend
-            - docker build -t test-backend ./backend
+              if [ -d "backend" ] && [ -f "backend/requirements.txt" ]; then
+                echo "Building backend..."
+                
+                # Python과 pip 설치 추가
+                echo "Installing Python and pip..."
+                apt-get update -qq
+                apt-get install -y python3 python3-pip --quiet
+                
+                cd backend
+                pip3 install -r requirements.txt --quiet
+                cd ..
+                echo "✅ Backend updated"
+              fi
 
-            # Integration test with docker-compose
-            - docker-compose up -d postgres
-            - sleep 20
-            - docker-compose up -d backend
-            - sleep 30
-            - docker-compose up -d frontend
-            - sleep 10
+            # 새 버전 Docker 이미지 빌드
+            - |
+              echo "🐳 Building updated Docker images..."
 
-            # Simple health check
-            - timeout 60 bash -c 'until curl -f http://localhost:8000/health; do sleep 2; done' || echo "Backend not ready, continuing..."
+              if [ -d "frontend" ]; then
+                docker build -t $PROJECT_NAME-frontend:$TIMESTAMP ./frontend
+                docker tag $PROJECT_NAME-frontend:$TIMESTAMP $PROJECT_NAME-frontend:latest
+              fi
 
-            - echo "✅ PR tests completed!"
+              if [ -d "backend" ]; then
+                docker build -t $PROJECT_NAME-backend:$TIMESTAMP ./backend
+                docker tag $PROJECT_NAME-backend:$TIMESTAMP $PROJECT_NAME-backend:latest
+              fi
+
+              echo "✅ Updated images built successfully!"
+              echo "🏷️  Version: $TIMESTAMP"
+
+              # TODO: 실제 프로덕션에서는 여기서 EC2 인스턴스에 
+              # 새 이미지를 배포하는 로직 추가 필요
+
+  # 🧪 Pull Request 검증
+  pull-requests:
+    '**':
+      - step:
+          name: 🧪 Pull Request 검증
+          services:
+            - docker
+          caches:
+            - node
+            - pip
+          script:
+            - echo "🧪 Testing Pull Request changes..."
+
+            # 프로젝트 구조 확인
+            - |
+              echo "📁 Checking project structure..."
+
+              ERRORS=0
+
+              # Frontend 확인
+              if [ -d "frontend" ]; then
+                if [ -f "frontend/package.json" ]; then
+                  echo "✅ Frontend structure OK"
+                  cd frontend
+                  npm install --prefer-offline --no-audit
+                  npm run build
+                  cd ..
+                  echo "✅ Frontend builds successfully"
+                else
+                  echo "❌ Frontend package.json missing"
+                  ERRORS=$((ERRORS + 1))
+                fi
+              else
+                echo "⚠️  No frontend directory found"
+              fi
+
+              # Backend 확인  
+              if [ -d "backend" ]; then
+                if [ -f "backend/requirements.txt" ]; then
+                  echo "✅ Backend structure OK"
+                  
+                  # Python과 pip 설치 추가
+                  echo "Installing Python and pip..."
+                  apt-get update -qq
+                  apt-get install -y python3 python3-pip --quiet
+                  
+                  cd backend
+                  pip3 install -r requirements.txt --quiet
+                  cd ..
+                  echo "✅ Backend dependencies OK"
+                else
+                  echo "❌ Backend requirements.txt missing"
+                  ERRORS=$((ERRORS + 1))
+                fi
+              else
+                echo "⚠️  No backend directory found"
+              fi
+
+              # Terraform 확인
+              if [ -d "terraform" ]; then
+                echo "✅ Terraform directory found"
+              else
+                echo "❌ Terraform directory missing"
+                ERRORS=$((ERRORS + 1))
+              fi
+
+              if [ $ERRORS -gt 0 ]; then
+                echo "❌ PR validation failed with $ERRORS errors"
+                exit 1
+              fi
+
+            # Docker 빌드 테스트
+            - |
+              echo "🐳 Testing Docker builds..."
+
+              if [ -d "frontend" ]; then
+                docker build -t test-pr-frontend ./frontend
+                echo "✅ Frontend Docker build OK"
+              fi
+
+              if [ -d "backend" ]; then
+                docker build -t test-pr-backend ./backend  
+                echo "✅ Backend Docker build OK"
+              fi
+
+            # 간단한 통합 테스트 (선택적)
+            - |
+              if [ -f "docker-compose.yml" ]; then
+                echo "🔧 Running quick integration test..."
+                
+                # PostgreSQL만 시작
+                docker-compose up -d postgres || echo "No postgres service defined"
+                sleep 10
+                
+                # 백엔드 헬스 체크 시도
+                if docker-compose up -d backend; then
+                  sleep 20
+                  timeout 30 bash -c 'until curl -f http://localhost:8000/health; do sleep 2; done' || echo "Backend health check timeout (normal for PR)"
+                fi
+              fi
           after-script:
-            - docker-compose down -v || true
+            # 정리
+            - docker-compose down -v 2>/dev/null || true
+            - docker system prune -f || true

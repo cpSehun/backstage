@@ -22,6 +22,29 @@ spec:
   type: service
 
   parameters:
+    - title: ⚠️  배포 전 필수 설정 안내
+      description: |
+        🔧 템플릿 실행 후 반드시 다음 단계를 수행해주세요:
+
+        1️⃣ 생성된 저장소 → Settings → Pipelines → Repository variables
+
+        2️⃣ 다음 4개 변수 설정:
+           • AWS_ACCESS_KEY_ID (✅ Secured 체크)
+           • AWS_SECRET_ACCESS_KEY (✅ Secured 체크)  
+           • AWS_KEY_NAME = 아래에서 입력한 키페어 이름
+
+        3️⃣ Pipelines 메뉴에서 "Enable Pipelines" 클릭
+
+        4️⃣ 15분 대기 후 완성된 애플리케이션 확인!
+      properties:
+        acknowledgment:
+          title: ✅ 위 내용을 확인하고 동의합니다
+          type: boolean
+          default: false
+          description: 체크하지 않으면 템플릿을 실행할 수 없습니다
+      required:
+        - acknowledgment
+
     - title: 📝 애플리케이션 정보
       required:
         - name
@@ -74,6 +97,7 @@ spec:
         - awsRegion
         - instanceType
         - databaseInstanceType
+        - keyName
       properties:
         awsRegion:
           title: AWS 리전
@@ -92,6 +116,15 @@ spec:
             - '싱가포르 (ap-southeast-1)'
             - '버지니아 북부 (us-east-1)'
             - '오레곤 (us-west-2)'
+
+        keyName:
+          title: EC2 키페어 이름
+          type: string
+          description: 사전에 생성된 EC2 키페어 이름을 입력하세요
+          default: 'backstage-fullstack-key'
+          ui:
+            help: '해당 리전에 존재하는 키페어 이름을 정확히 입력하세요'
+
         instanceType:
           title: EC2 인스턴스 타입
           type: string
@@ -120,8 +153,8 @@ spec:
             - 'db.t3.large'
           enumNames:
             - 'db.t3.micro (1 vCPU, 1GB RAM) - 테스트용'
-            - 'db.t3.small (2 vCPU, 2GB RAM) - 개발용'
-            - 'db.t3.medium (2 vCPU, 4GB RAM) - 운영용 (권장)'
+            - 'db.t3.small (2 vCPU, 2GB RAM) - 개발용 (권장)'
+            - 'db.t3.medium (2 vCPU, 4GB RAM) - 운영용'
             - 'db.t3.large (2 vCPU, 8GB RAM) - 고성능'
 
   steps:
@@ -137,6 +170,7 @@ spec:
           awsRegion: ${{ parameters.awsRegion }}
           instanceType: ${{ parameters.instanceType }}
           databaseInstanceType: ${{ parameters.databaseInstanceType }}
+          keyName: ${{ parameters.keyName }}
 
     - id: publish
       name: 📤 Bitbucket에 저장소 생성
@@ -155,7 +189,7 @@ spec:
           - ☁️ AWS infrastructure with Terraform
           - 🚀 Bitbucket Pipeline CI/CD
 
-          Ready for development and deployment!
+          Ready for Repository variables setup and deployment!
 
     - id: register
       name: 📋 Backstage 카탈로그에 등록
@@ -175,22 +209,52 @@ spec:
       - title: 🚀 Pipeline 상태 확인
         url: ${{ steps.publish.output.remoteUrl }}/pipelines
         icon: build
+      - title: ☁️ AWS 콘솔
+        url: https://console.aws.amazon.com/ec2/home?region=${{ parameters.awsRegion }}
     text:
-      - title: 🎉 생성 완료!
+      - title: 📋 다음 단계를 수행하세요 (5분)
         content: |
-          풀스택 애플리케이션이 성공적으로 생성되었습니다!
+          🎉 저장소가 성공적으로 생성되었습니다!
 
-          **다음 단계:**
-          1. 📋 Backstage 카탈로그에서 애플리케이션 상태 확인
-          2. 🚀 Bitbucket Pipeline에서 자동 배포 진행 상황 모니터링
-          3. ☁️ AWS 콘솔에서 인프라 리소스 확인
-          4. 🌐 배포 완료 후 애플리케이션 URL 접속
+          ## 🔧 배포를 위한 필수 설정:
 
-          **포함된 기능:**
-          ✅ Next.js 프론트엔드
-          ✅ Python FastAPI 백엔드
-          ✅ PostgreSQL 데이터베이스
-          ✅ Docker 컨테이너화
-          ✅ AWS 인프라 (Terraform)
-          ✅ CI/CD 파이프라인
-          ✅ 모니터링 및 로깅
+          ### 1️⃣ 환경 변수 설정 (3분)
+          ```
+          📍 경로: 저장소 → Settings → Pipelines → Repository variables
+
+          추가할 변수 4개:
+          ├── AWS_ACCESS_KEY_ID = your-aws-access-key (✅ Secured)
+          ├── AWS_SECRET_ACCESS_KEY = your-aws-secret-key (✅ Secured)
+          └── AWS_KEY_NAME = ${{ parameters.keyName }} (⬜ Secured 안함)
+          ```
+
+          ### 2️⃣ Pipeline 활성화 및 실행 (2분)
+          ```
+          📍 경로: 저장소 → Pipelines 메뉴
+
+          ✅ "Enable Pipelines" 버튼 클릭
+          ✅ 자동으로 첫 번째 배포 시작! (15분 소요)
+          ```
+
+          ### 3️⃣ 결과 확인 (배포 완료 후)
+          ```
+          ✅ Pipeline 로그에서 Application URL 확인
+          ✅ AWS Console에서 생성된 리소스 확인:
+             ├── EC2 Auto Scaling Group
+             ├── RDS PostgreSQL Database  
+             ├── Application Load Balancer
+             └── VPC 네트워크
+          ✅ 웹 브라우저에서 애플리케이션 접속 테스트
+          ```
+
+          ## 🎯 준비사항 체크:
+          - ✅ AWS 액세스 키 발급 완료
+          - ✅ EC2 키페어(${{ parameters.keyName }}) 생성 완료 (${{ parameters.awsRegion }} 리전)
+          - ✅ AWS 권한 확인 (EC2, RDS, VPC, IAM)
+
+          ## 🆘 문제 발생 시:
+          - Pipeline 로그에서 정확한 오류 메시지 확인
+          - AWS 권한 또는 키페어 이름 재확인  
+          - 환경 변수의 Secured 체크박스 설정 확인
+
+          **🚀 설정 완료 후 15분이면 완전한 풀스택 애플리케이션이 AWS에서 실행됩니다!**

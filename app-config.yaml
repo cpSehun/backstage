@@ -102,15 +102,13 @@ auth:
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
-
-## 웹훅 임시 주석(public IP없음)
-# events:
-#   http:
-#     topics:
-#       - bitbucketCloud
-#   modules:
-#     bitbucketCloud:
-#       webhookSecret: ${BITBUCKET_WEBHOOK_SECRET}
+  actions:
+    http:
+      enabled: true
+  secrets:
+    BITBUCKET_APP_PASSWORD: ${BITBUCKET_CLOUD_APP_PASSWORD}
+    AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+    AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
 
 catalog:
   # import:
